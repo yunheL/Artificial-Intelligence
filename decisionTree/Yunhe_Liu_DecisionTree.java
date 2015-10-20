@@ -68,6 +68,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		System.out.println();
 		System.out.println(test.length);
 		*/
+		//TODO: REMOVE debug code
 		//int i = 4;
 		//System.out.println("vote0" + i);
 		//System.out.println("here");
@@ -75,7 +76,10 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		//System.out.println(B(0.5));//passsed
 		//System.out.println(calculateEntropy(tree));//inifinite loop
 		//System.out.println(childrenList.length);
+		//System.out.println(tree.toString());
 		System.out.println(calculateEntropy(tree));
+		//System.out.println(B(0.1));
+		//System.out.println(B(0.9));
 	}
 
 	// This method recursively builds a decision tree based on
@@ -115,7 +119,8 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			if(childrenList[i].getString("party") == "REPUBLICAN")
 			{
 				republicanCount++;
-			} 
+			}
+			i++;
 		}
 		
 		demoCount = childrenList.length - republicanCount;
@@ -190,7 +195,8 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			if(childrenList[i].getString(attribute) == "YEA")
 			{
 				YEAList.add(childrenList[i]);
-			} 
+			}
+			i++;
 		}
 		
 		YEACount = (double)(YEAList.size());
@@ -213,12 +219,19 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		int i = 0;
 		while(i < childrenList.length)
 		{
-			if(childrenList[i].getString("party") == "REPUBLICAN")
+			//System.out.println(childrenList[i].getString("party"));
+			System.out.println(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
+			if(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
 			{
 				republicanCount = republicanCount + 1.0;
+				System.out.println("Here");
 			}
+			i++;
 		}
-
+		
+		System.out.println("republicanCount = " + republicanCount);
+		System.out.println("listLength = " + childrenList.length);
+		
 		republicanRate = republicanCount/((double)(childrenList.length));
 		entropyRepublican = B(republicanRate);	
 		return entropyRepublican;
@@ -231,6 +244,11 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	{
 		// TODO - implement this method
 		if(q==1)
+		{
+			return 0;
+		}
+		
+		if(q==0)
 		{
 			return 0;
 		}
