@@ -9,3 +9,11 @@ B function special cases B(0),B(1) fixed
 ### 10/21 1:06am
 7/9 implemented, finished recursiveBudidingTree
 used a lot of time to debug the following part:
+```
+tree.addChild(YEA);
+tree.addChild(NAY);
+		
+YEA = tree.getChild(0);
+NAY = tree.getChild(1);
+```
+for some reason you have to do both but I haven't figure why yet. Going to put more discussion in it.
