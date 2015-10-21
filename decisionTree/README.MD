@@ -17,3 +17,7 @@ YEA = tree.getChild(0);
 NAY = tree.getChild(1);
 ```
 for some reason you have to do both but I haven't figure why yet. Going to put more discussion in it.
+
+### 10/21 3:40am
+refined based case for recursiveBuidlingTree()
+finished predict function
