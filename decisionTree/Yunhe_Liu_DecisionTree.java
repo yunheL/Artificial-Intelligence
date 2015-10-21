@@ -163,6 +163,15 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		
 		//first argument is the dataset, second is the root of the tree
 		recursiveBuildTree(dataset, tree);
+		
+		//TODO remove debug code
+		XML example;
+		example = p.loadXML("example.xml");
+		removeWhiteSpace(example);
+		//System.out.println(example.toString());
+		
+		
+		System.out.println(predict(example, tree));
 		//toDisplay(tree);
 	}
 
@@ -180,12 +189,12 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		 * recursively split on the best attribute
 		 * stop when:
 		 * 1. entropy = 0, then pick that single party as the decision
-		 * 2. finished all the 16 attributes, then pick the party with more
+		 * 2. keep splitting until cannot be split anymore, then pick the party with more
 		 * examples as the decision
 		 */
 		
 		//TODO - Make it recursive, don't forget base case
-		if ((dataset.getChildCount() == 1) || (calculateEntropy(dataset) == 0.0))
+		if ((dataset.getChildCount() < 2) || (calculateEntropy(dataset) == 0.0))
 		{
 			String predict = plurality(dataset);
 			XML result = new XML(predict);
@@ -195,27 +204,27 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		}
 		
 		String attribute = chooseSplitAttribute(dataset);
-		System.out.println(attribute);
+		//System.out.println(attribute);
 		//System.out.println(attribute);
 
 		XML YEAGroup = new XML("YEAGroup");
 		XML NAYGroup = new XML("NAYGroup");
 		
-		XML YEA = new XML(attribute);
-		XML NAY = new XML(attribute);
+		XML YEA = new XML(attribute+"YEA");
+		XML NAY = new XML(attribute+"NAY");
 
 		addChildrenToGroup(dataset, YEAGroup, attribute, "YEA");
 		addChildrenToGroup(dataset, NAYGroup, attribute, "NAY");
 		
 		//TODO: Remove debug code
-		
+		/*
 		System.out.println("This is the YEA group");
 		toDisplay(YEAGroup);
 		System.out.println();
 		System.out.println("This is the NAY group");
 		toDisplay(NAYGroup);
 		System.out.println();
-		
+		*/
 		
 		//removeAllChildren(tree);
 		//System.out.println("here");
@@ -481,6 +490,70 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	public String predict(XML example, XML decisionTree)
 	{
 		// TODO - implement this method
-		return "";
+		//System.out.println(example.getString("vote09"));
+		//System.out.println(example);
+		
+		String attribute = "abc";
+		XML curr =  new XML("curr");
+		//System.out.println(attribute.substring(0,3));
+		
+		curr = decisionTree;
+		while(curr.getChild(0).getName().substring(0, 4).equalsIgnoreCase("vote"))
+		{
+			//System.out.println("curr is:" + curr.getName());
+			attribute = curr.getChild(0).getName().substring(0, 6);
+			//System.out.println("attribute is " + attribute);
+			//System.out.println("opinion is " + example.getString(attribute));
+			
+			if(example.getString(attribute).equalsIgnoreCase("YEA"))
+			{
+				curr = curr.getChild(0);
+			}
+			else if(example.getString(attribute).equalsIgnoreCase("NAY"))
+			{
+				curr = curr.getChild(1);
+			}
+			else
+			{
+				System.out.println("Error: input file invalid");
+				return "error";
+			}
+
+		}
+		
+		//System.out.println(curr.getChild(0).getName().substring(0, 3));
+		
+		if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("REP") || curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("DEM"))
+		{
+			if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("REP"))
+			{
+				return "REPUBLICAN";
+			}
+			else if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("DEM"))
+			{
+				return "DEMOCRAT";
+			}
+			else
+			{
+				System.out.println("Error: input file invalid");
+				return "error";
+			}
+					
+		}
+		else
+		{
+			System.out.println("Error: input file invalid");
+			return "error";
+		}
+		
+		
+		
+		//System.out.println(decisionTree.getChild(0).getChild(0).getName());
+		//System.out.println(decisionTree.getChild(0).getChild(0));
+		//System.out.println(decisionTree.getChild(0).getChild(0).getParent());
+		
+		
+		//XML[] childrenList = decisionTree.getChildren();
+		//System.out.println(childrenList[0]);
 	}
 }
