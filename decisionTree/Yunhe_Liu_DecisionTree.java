@@ -185,7 +185,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		 */
 		
 		//TODO - Make it recursive, don't forget base case
-		if (dataset.getChildCount() < 8)
+		if ((dataset.getChildCount() == 1) || (calculateEntropy(dataset) == 0.0))
 		{
 			String predict = plurality(dataset);
 			XML result = new XML(predict);
