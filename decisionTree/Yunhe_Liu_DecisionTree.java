@@ -48,6 +48,76 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		}
 	}
 
+	public void addChildrenToGroup(XML src, XML dest, String attribute, String opinion)
+	{
+		//base case for recursion
+		if (src == null)	
+			return;
+
+		//The list contains all the children of the current
+		//node.
+		XML[] childrenList = src.getChildren();
+
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			if(childrenList[i].getString(attribute).equalsIgnoreCase(opinion))
+			{
+				dest.addChild(childrenList[i]);
+			}
+			i++;
+		}
+	}
+
+	//This method is used in calculatePostSplitEntropy() to
+	//remove the Children who don't belong the current group.
+	//The two groups are "YEA" group and "NAY" group.
+	//The parameter opinion can either be "YEA" or "NAY"
+	public void removeOtherChildren(XML data, String attribute, String opinion)
+	{
+		//base case for recursion
+		if (data == null)	
+			return;
+
+		//The list contains all the children of the current
+		//node.
+		XML[] childrenList = data.getChildren();
+
+		//traverse through all the nodes within the list and
+		//remove white space and do it recursively
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//if the node is whitespace, then remove it
+			if (childrenList[i].getString(attribute).equalsIgnoreCase(opinion))
+			{
+				data.removeChild(childrenList[i]);
+			}
+
+			//Don't see the need of using recursive at the time of
+			//developing this method
+			/*
+			//otherwise recursively traverse based on this node
+			else{
+				removeOtherChildren(childrenList[i], attribute, opinion);
+			}
+			 */
+
+			i++;
+		}
+	}
+	
+	public void toDisplay(XML dataset)
+	{
+		XML[] childrenList = dataset.getChildren();
+		
+		int i = 0;
+		for(i = 0; i < childrenList.length; i++)
+		{
+			System.out.println("Child[" + i +"] is:" + childrenList[i]);
+		}
+	}
+
 	public void learnFromTrainingData(String filename)
 	{
 		// NOTE: Set the inherited field dirtyTree to true after building the
@@ -57,17 +127,22 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		// TODO - implement this method
 		tree = p.loadXML(filename);
 		removeWhiteSpace(tree);
-		
-		XML[] childrenList = tree.getChildren();
-		
+
+		//System.out.println("This is the tree:");
+		//System.out.println(tree);
+
+		//XML[] childrenList = tree.getChildren();
+		//System.out.println("list length is:" + childrenList.length);
+		//System.out.println("children number is:" + tree.getChildCount());
+		//System.out.println(childrenList[0]);
 		//System.out.print(childrenList[0].getString("party"));
 		dirtyTree = true;
-		
+
 		/*
 		int[] test = {1,2,3};
 		System.out.println();
 		System.out.println(test.length);
-		*/
+		 */
 		//TODO: REMOVE debug code
 		//int i = 4;
 		//System.out.println("vote0" + i);
@@ -77,9 +152,11 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		//System.out.println(calculateEntropy(tree));//inifinite loop
 		//System.out.println(childrenList.length);
 		//System.out.println(tree.toString());
-		System.out.println(calculateEntropy(tree));
+		//System.out.println(calculateEntropy(tree));
 		//System.out.println(B(0.1));
 		//System.out.println(B(0.9));
+		//System.out.println(plurality(tree));
+		System.out.println(calculatePostSplitEntropy("vote01", tree));
 	}
 
 	// This method recursively builds a decision tree based on
@@ -112,19 +189,19 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		int republicanCount = 0;
 		int demoCount = 0;
 		String plurality = "";
-		
+
 		int i = 0;
 		while(i < childrenList.length)
 		{
-			if(childrenList[i].getString("party") == "REPUBLICAN")
+			if(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"))
 			{
 				republicanCount++;
 			}
 			i++;
 		}
-		
+
 		demoCount = childrenList.length - republicanCount;
-		
+
 		if(republicanCount > demoCount)
 		{
 			plurality = "REPUBLICAN";
@@ -137,7 +214,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		{
 			plurality = "DEMOCRAT";
 		}
-		
+
 		return plurality;
 	}
 
@@ -151,7 +228,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		double currEntropy = 1.0;
 		String attribute = "";
 		String chosenAttribute = "vote01";
-		
+
 		int i = 1;
 		for(i = 1; i <= 16; i++)
 		{
@@ -164,14 +241,14 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 				attribute = "vote" + i;
 			}
 			currEntropy = calculatePostSplitEntropy(attribute, dataset);
-			
+
 			if (currEntropy < lowestEntropy)
 			{
 				lowestEntropy = currEntropy;
 				chosenAttribute = attribute;
 			}
 		}
-		
+
 		return chosenAttribute;
 	}
 
@@ -181,14 +258,58 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	public double calculatePostSplitEntropy(String attribute, XML dataset)
 	{		
 		// TODO - implement this method
-		XML[] childrenList = dataset.getChildren();
+		XML YEAGroup = new XML("YEAGroup");
+		XML NAYGroup = new XML("NAYGroup");
+		
+		double YEAEntropy = 0.0;
+		double NAYEntropy = 0.0;
+		double YEAWeight = 0.0;
+		double NAYWeight = 0.0;
+		double totalEntropy = 0.0;
+		//removeOtherChildren(YEAGroup, attribute, "NAY");
+		//TODO: remove debug code
+		//System.out.println("This is the NAYGroup:");
+		//System.out.println(NAYGroup.toString());	
+		//removeOtherChildren(NAYGroup, attribute, "YEA");
+
+		//System.out.println(dataset.toString());
+		addChildrenToGroup(dataset, YEAGroup, attribute, "YEA");
+		addChildrenToGroup(dataset, NAYGroup, attribute, "NAY");
+		
+		YEAEntropy = calculateEntropy(YEAGroup);
+		NAYEntropy = calculateEntropy(NAYGroup);
+		
+		System.out.println("YEAEntropy is : " + YEAEntropy);
+		System.out.println("NAYEntropy is : " + NAYEntropy);
+
+		
+		
+		//TODO: remove debug code
+//		System.out.println("This is the YEAGroup:");
+//		System.out.println(YEAGroup.toString());
+//
+//		System.out.println("This is the NAYGroup:");
+//		System.out.println(NAYGroup.toString());
+//		
+//		System.out.println("YEA# is " + YEAGroup.getChildCount());
+//		System.out.println("NAY# is " + NAYGroup.getChildCount());
+//		System.out.println("Data# is " + dataset.getChildCount());
+//		System.out.println("======================");
+//		System.out.println("This is the YEAGroup:");
+//		toDisplay(YEAGroup);
+//		System.out.println("======================");
+//		System.out.println("This is the NAYGroup:");
+//		toDisplay(NAYGroup);
+		
+		
+		/*
 		ArrayList<XML> YEAList = new ArrayList<XML>();
 		double YEACount = 0.0;
 		double YEARate = 0.0;
 		double entropyYEA = 0.0;
-		
+
 		//ArrayList<XML> NAYList = new ArrayList<XML>();
-		
+
 		int i = 0;
 		while(i < childrenList.length)
 		{
@@ -198,12 +319,13 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			}
 			i++;
 		}
-		
+
 		YEACount = (double)(YEAList.size());
 		YEARate = (double)(YEACount/((double)(childrenList.length)));
 		entropyYEA = B(YEARate);
-		System.out.println("here");
-		return entropyYEA;
+		 */
+
+		return 0.0;
 	}
 
 	// This method calculates and returns the entropy for the children examples
@@ -215,23 +337,24 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		double republicanCount = 0.0;
 		double republicanRate = 0.0;
 		double entropyRepublican = 0.0;
-		
+
 		int i = 0;
 		while(i < childrenList.length)
 		{
+			//TODO: remove debug code
 			//System.out.println(childrenList[i].getString("party"));
-			System.out.println(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
-			if(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
+			//System.out.println(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
+			if(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"))
 			{
 				republicanCount = republicanCount + 1.0;
-				System.out.println("Here");
+				//System.out.println("Here");
 			}
 			i++;
 		}
-		
-		System.out.println("republicanCount = " + republicanCount);
-		System.out.println("listLength = " + childrenList.length);
-		
+
+		//System.out.println("republicanCount = " + republicanCount);
+		//System.out.println("listLength = " + childrenList.length);
+
 		republicanRate = republicanCount/((double)(childrenList.length));
 		entropyRepublican = B(republicanRate);	
 		return entropyRepublican;
@@ -247,12 +370,12 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		{
 			return 0;
 		}
-		
+
 		if(q==0)
 		{
 			return 0;
 		}
-		
+
 		double entropy = 0.0;
 		double supriseSuccess = 0.0;
 		double supriseFail = 0.0;
