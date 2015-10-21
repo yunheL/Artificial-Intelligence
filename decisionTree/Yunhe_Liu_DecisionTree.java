@@ -114,6 +114,15 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		XML root = new XML("root");
 		tree = root;
 		
+		XML dataset = new XML("dataset");
+		dataset = p.loadXML(filename);
+		removeWhiteSpace(dataset);
+		
+		dirtyTree = true;
+		
+		recursiveBuildTree(dataset, tree);
+		
+		
 		//XML kid = new XML("kid");
 		//XML grandkid = new XML("")
 		/*
@@ -124,9 +133,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		
 		//System.out.println(tree);
 		
-		XML dataset = new XML("dataset");
-		dataset = p.loadXML(filename);
-		removeWhiteSpace(dataset);
+		
 
 		//System.out.println("This is the tree:");
 		//System.out.println(tree);
@@ -136,7 +143,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		//System.out.println("children number is:" + tree.getChildCount());
 		//System.out.println(childrenList[0]);
 		//System.out.print(childrenList[0].getString("party"));
-		dirtyTree = true;
+		
 
 		/*
 		int[] test = {1,2,3};
@@ -162,16 +169,16 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		
 		
 		//first argument is the dataset, second is the root of the tree
-		recursiveBuildTree(dataset, tree);
+		
 		
 		//TODO remove debug code
-		XML example;
-		example = p.loadXML("example.xml");
-		removeWhiteSpace(example);
+		//XML example;
+		//example = p.loadXML("example.xml");
+		//removeWhiteSpace(example);
 		//System.out.println(example.toString());
 		
 		
-		System.out.println(predict(example, tree));
+		//System.out.println(predict(example, tree));
 		//toDisplay(tree);
 	}
 
@@ -193,8 +200,10 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		 * examples as the decision
 		 */
 		
+		//System.out.println(calculateEntropy(dataset) == 0.0);
+		
 		//TODO - Make it recursive, don't forget base case
-		if ((dataset.getChildCount() < 2) || (calculateEntropy(dataset) == 0.0))
+		if ((dataset.getChildCount() < 2) || calculateEntropy(dataset) == 0.0)
 		{
 			String predict = plurality(dataset);
 			XML result = new XML(predict);
@@ -215,6 +224,8 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 
 		addChildrenToGroup(dataset, YEAGroup, attribute, "YEA");
 		addChildrenToGroup(dataset, NAYGroup, attribute, "NAY");
+		
+		//System.out.println("here");
 		
 		//TODO: Remove debug code
 		/*
@@ -477,11 +488,39 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	public double runTests(String filename)
 	{
 		// TODO - implement this method
+		//learnFromTrainingData(filename);
+		
+		String result = "guess";
+		int correctCount = 0;
+		double correctRate = 0.0;
+		
 		XML dataset = new XML("dataset");
 		dataset = p.loadXML(filename);
 		removeWhiteSpace(dataset);
 		
-		return 0.0;
+		//recursiveBuildTree(dataset, tree);
+		
+		XML[] childrenList = dataset.getChildren();
+		//System.out.print(childrenList.length);
+		
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			result = predict(childrenList[i], tree);
+			if(result.equalsIgnoreCase(childrenList[i].getString("party")))
+			{
+				//System.out.println("here");
+				//System.out.println(childrenList[i].getString("party"));
+				correctCount++;
+			}
+			i++;
+		}
+		//System.out.println(correctCount);
+		correctRate = (double)((double)(correctCount))/((double)(childrenList.length));
+		
+		return correctRate;
+		
+		//return 0.0;
 	}
 
 	// This method runs a single example through the decision tree, and then 
