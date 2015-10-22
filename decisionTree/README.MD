@@ -21,3 +21,7 @@ for some reason you have to do both but I haven't figure why yet. Going to put m
 ### 10/21 3:40am
 refined based case for recursiveBuidlingTree()
 finished predict function
+
+### 10/21 5:08am
+Finished all implementation 
+need to clean up code
