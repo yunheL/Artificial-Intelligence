@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import processing.core.*;
 import processing.data.*;
 
+//correctfilemark : this is the correct file to be hand in_10/21/15_8pm
+
 public class Yunhe_Liu_DecisionTree extends DrawableTree
 {
 	public Yunhe_Liu_DecisionTree(PApplet p) { super(p); }
@@ -12,9 +14,6 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// Each of the nodes in this resulting tree will be named after
 	// either an attribute to split on (vote01, vote02, etc), or a party
 	// classification (DEMOCRAT, REPUBLICAN, or possibly TIE).
-
-	//data contain in the data file
-	//private XML data;
 
 	/*
 	 * This is a helper method that I wrote to recursive
@@ -48,6 +47,10 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		}
 	}
 
+	/*
+	 * This method put string into groups according to attribute and opnion
+	 * Opinion means YEA and NAY
+	 */
 	public void addChildrenToGroup(XML src, XML dest, String attribute, String opinion)
 	{
 		//base case for recursion
@@ -93,6 +96,9 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		}
 	}
 
+	/*
+	 * This method helps debugging display
+	 */
 	public void toDisplay(XML dataset)
 	{
 		XML[] childrenList = dataset.getChildren();
@@ -110,76 +116,24 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		// decision tree and storing it in the inherited field tree.  This will
 		// trigger the DrawableTree's graphical rendering of the tree.
 
-		// TODO - implement this method
 		XML root = new XML("root");
 		tree = root;
-		
+
 		XML dataset = new XML("dataset");
 		dataset = p.loadXML(filename);
 		removeWhiteSpace(dataset);
-		
+
 		dirtyTree = true;
-		
+
 		recursiveBuildTree(dataset, tree);
 		
-		
-		//XML kid = new XML("kid");
-		//XML grandkid = new XML("")
 		/*
-		root.addChild(kid);
-		kid = root.getChild(0);
-		System.out.println("kid's parent is:" + kid.getParent());
+		XML test = new XML("test");
+		test = p.loadXML(filename);
+		System.out.println("before remove all children " + test.toString());
+		removeAllChildren(test);
+		System.out.println("after remove all children " + test.toString());
 		*/
-		
-		//System.out.println(tree);
-		
-		
-
-		//System.out.println("This is the tree:");
-		//System.out.println(tree);
-
-		//XML[] childrenList = tree.getChildren();
-		//System.out.println("list length is:" + childrenList.length);
-		//System.out.println("children number is:" + tree.getChildCount());
-		//System.out.println(childrenList[0]);
-		//System.out.print(childrenList[0].getString("party"));
-		
-
-		/*
-		int[] test = {1,2,3};
-		System.out.println();
-		System.out.println(test.length);
-		 */
-		//TODO: REMOVE debug code
-		//int i = 4;
-		//System.out.println("vote0" + i);
-		//System.out.println("here");
-		//System.out.println(chooseSplitAttribute(tree));
-		//System.out.println(B(0.5));//passsed
-		//System.out.println(calculateEntropy(tree));//inifinite loop
-		//System.out.println(childrenList.length);
-		//System.out.println(tree.toString());
-		//System.out.println(calculateEntropy(tree));
-		//System.out.println(B(0.1));
-		//System.out.println(B(0.9));
-		//System.out.println(plurality(tree));
-		//System.out.println(calculatePostSplitEntropy("vote01", tree));
-		//XML root = new XML("root");
-		
-		
-		
-		//first argument is the dataset, second is the root of the tree
-		
-		
-		//TODO remove debug code
-		//XML example;
-		//example = p.loadXML("example.xml");
-		//removeWhiteSpace(example);
-		//System.out.println(example.toString());
-		
-		
-		//System.out.println(predict(example, tree));
-		//toDisplay(tree);
 	}
 
 	// This method recursively builds a decision tree based on
@@ -191,7 +145,6 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		// child[0], which will be drawn to the left of any NAY branches.
 		// The grading tests assume that you are following this convention.
 
-		// TODO - implement this method
 		/*
 		 * recursively split on the best attribute
 		 * stop when:
@@ -199,11 +152,40 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		 * 2. keep splitting until cannot be split anymore, then pick the party with more
 		 * examples as the decision
 		 */
+
+		//base case, either cannot be split anymore or entropy = 0
+		XML YEATest = new XML("YEARoot");
+		XML NAYTest = new XML("NAYRoot");
 		
-		//System.out.println(calculateEntropy(dataset) == 0.0);
+		String attriTest = "a";
+		int attributeCount = 0;
+		int i = 1;
+		for(i = 1; i <= 16; i++)
+		{
+			//make sure to put a 0 in place which the attribute number is 
+			//smaller than 10
+			if(i < 10)
+			{
+				attriTest = "vote0" + i;
+			}
+			else
+			{
+				attriTest = "vote" + i;
+			}
+			
+			addChildrenToGroup(dataset, YEATest, attriTest, "YEA");
+			addChildrenToGroup(dataset, NAYTest, attriTest, "NAY");
 		
-		//TODO - Make it recursive, don't forget base case
-		if ((dataset.getChildCount() < 2) || calculateEntropy(dataset) == 0.0)
+			if((YEATest.getChildCount() == 0) || (NAYTest.getChildCount() == 0))
+			{
+				attributeCount++;
+			}
+			
+			removeAllChildren(YEATest);
+			removeAllChildren(NAYTest);
+		}
+
+		if ((dataset.getChildCount() < 2) || ((calculateEntropy(dataset)) == 0.0) || (attributeCount == 16))
 		{
 			String predict = plurality(dataset);
 			XML result = new XML(predict);
@@ -211,58 +193,32 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			result = tree.getChild(0);
 			return;
 		}
+
 		
 		String attribute = chooseSplitAttribute(dataset);
-		//System.out.println(attribute);
-		//System.out.println(attribute);
 
+		//reduced dataset to be passed on
 		XML YEAGroup = new XML("YEAGroup");
 		XML NAYGroup = new XML("NAYGroup");
-		
+
+		//node to put into tree
 		XML YEA = new XML(attribute+"YEA");
 		XML NAY = new XML(attribute+"NAY");
 
+		//split groups
 		addChildrenToGroup(dataset, YEAGroup, attribute, "YEA");
 		addChildrenToGroup(dataset, NAYGroup, attribute, "NAY");
-		
-		//System.out.println("here");
-		
-		//TODO: Remove debug code
-		/*
-		System.out.println("This is the YEA group");
-		toDisplay(YEAGroup);
-		System.out.println();
-		System.out.println("This is the NAY group");
-		toDisplay(NAYGroup);
-		System.out.println();
-		*/
-		
-		//removeAllChildren(tree);
-		//System.out.println("here");
-		
+
+		//link the nodes
 		tree.addChild(YEA);
 		tree.addChild(NAY);
-		//toDisplay(tree);
-		
+
 		YEA = tree.getChild(0);
 		NAY = tree.getChild(1);
-		
-		//System.out.println(tree.getChild(0));
-		//System.out.println(tree.getChild(1));
+
+		//recursive calls
 		recursiveBuildTree(YEAGroup, YEA);
 		recursiveBuildTree(NAYGroup, NAY);
-		//tree = tree.getParent().getChild(1);
-		//System.out.println(tree);
-		
-		//System.out.println(tree);
-		//System.out.println(tree);
-		//toDisplay(tree);
-		//System.out.println("YEA is: " + YEA);
-		//System.out.println("YEA'S parent is:" + YEA.getParent());
-		
-		
-		
-		
 	}
 
 	// This method calculates and returns the mode (most common value) among
@@ -270,12 +226,12 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// happens to be an exact tie, this method returns "TIE".
 	public String plurality(XML dataset)
 	{
-		// TODO - implement this method
 		XML[] childrenList = dataset.getChildren();
 		int republicanCount = 0;
 		int demoCount = 0;
 		String plurality = "";
 
+		//go through all children and count republican
 		int i = 0;
 		while(i < childrenList.length)
 		{
@@ -288,6 +244,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 
 		demoCount = childrenList.length - republicanCount;
 
+		//determine which is the mode
 		if(republicanCount > demoCount)
 		{
 			plurality = "REPUBLICAN";
@@ -309,15 +266,17 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// to their value for this attribute into two separate groups: YEA vs. NAY.	
 	public String chooseSplitAttribute(XML dataset)
 	{
-		// TODO - implement this method
 		double lowestEntropy = 1.0;
 		double currEntropy = 1.0;
 		String attribute = "";
 		String chosenAttribute = "vote01";
 
+		//traverse through all 16 attributes
 		int i = 1;
 		for(i = 1; i <= 16; i++)
 		{
+			//make sure to put a 0 in place which the attribute number is 
+			//smaller than 10
 			if(i < 10)
 			{
 				attribute = "vote0" + i;
@@ -328,6 +287,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			}
 			currEntropy = calculatePostSplitEntropy(attribute, dataset);
 
+			//find the smallest entropy
 			if (currEntropy < lowestEntropy)
 			{
 				lowestEntropy = currEntropy;
@@ -335,6 +295,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			}
 		}
 		//System.out.println(lowestEntropy);
+		//System.out.println("here");
 		return chosenAttribute;
 	}
 
@@ -343,7 +304,6 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// on their YEA vs. NAY value for the specified attribute.
 	public double calculatePostSplitEntropy(String attribute, XML dataset)
 	{		
-		// TODO - implement this method
 		XML YEAGroup = new XML("YEAGroup");
 		XML NAYGroup = new XML("NAYGroup");
 
@@ -352,70 +312,21 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		double YEAWeight = 0.0;
 		double NAYWeight = 0.0;
 		double totalEntropy = 0.0;
-		//removeOtherChildren(YEAGroup, attribute, "NAY");
-		//TODO: remove debug code
-		//System.out.println("This is the NAYGroup:");
-		//System.out.println(NAYGroup.toString());	
-		//removeOtherChildren(NAYGroup, attribute, "YEA");
 
-		//System.out.println(dataset.toString());
+		//split children into groups based on YEA/NAY and attribute
 		addChildrenToGroup(dataset, YEAGroup, attribute, "YEA");
 		addChildrenToGroup(dataset, NAYGroup, attribute, "NAY");
 
+		//calculate separate entropy
 		YEAEntropy = calculateEntropy(YEAGroup);
 		NAYEntropy = calculateEntropy(NAYGroup);
-//		System.out.println("YEAEntropy is : " + YEAEntropy);
-//		System.out.println("NAYEntropy is : " + NAYEntropy);
 
+		//calculate group weight
 		YEAWeight = ((double)(YEAGroup.getChildCount()))/((double)(dataset.getChildCount()));
 		NAYWeight = ((double)(NAYGroup.getChildCount()))/((double)(dataset.getChildCount()));
-//		System.out.println("YEAWeight is : " + YEAWeight);
-//		System.out.println("NAYWeight is : " + NAYWeight);
-		
+
+		//get total entropy
 		totalEntropy = YEAEntropy * YEAWeight + NAYEntropy * NAYWeight;
-//		System.out.println("totalEntropy is : " + totalEntropy);
-
-
-		//TODO: remove debug code
-		//		System.out.println("This is the YEAGroup:");
-		//		System.out.println(YEAGroup.toString());
-		//
-		//		System.out.println("This is the NAYGroup:");
-		//		System.out.println(NAYGroup.toString());
-		//		
-		//		System.out.println("YEA# is " + YEAGroup.getChildCount());
-		//		System.out.println("NAY# is " + NAYGroup.getChildCount());
-		//		System.out.println("Data# is " + dataset.getChildCount());
-		//		System.out.println("======================");
-		//		System.out.println("This is the YEAGroup:");
-		//		toDisplay(YEAGroup);
-		//		System.out.println("======================");
-		//		System.out.println("This is the NAYGroup:");
-		//		toDisplay(NAYGroup);
-
-
-		/*
-		ArrayList<XML> YEAList = new ArrayList<XML>();
-		double YEACount = 0.0;
-		double YEARate = 0.0;
-		double entropyYEA = 0.0;
-
-		//ArrayList<XML> NAYList = new ArrayList<XML>();
-
-		int i = 0;
-		while(i < childrenList.length)
-		{
-			if(childrenList[i].getString(attribute) == "YEA")
-			{
-				YEAList.add(childrenList[i]);
-			}
-			i++;
-		}
-
-		YEACount = (double)(YEAList.size());
-		YEARate = (double)(YEACount/((double)(childrenList.length)));
-		entropyYEA = B(YEARate);
-		 */
 
 		return totalEntropy;
 	}
@@ -424,29 +335,23 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// of a single dataset node with respect to which party they belong to.
 	public double calculateEntropy(XML dataset)
 	{
-		// TODO - implement this method
 		XML[] childrenList = dataset.getChildren();
 		double republicanCount = 0.0;
 		double republicanRate = 0.0;
 		double entropyRepublican = 0.0;
 
+		//go through the list and count republican
 		int i = 0;
 		while(i < childrenList.length)
 		{
-			//TODO: remove debug code
-			//System.out.println(childrenList[i].getString("party"));
-			//System.out.println(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"));
 			if(childrenList[i].getString("party").equalsIgnoreCase("REPUBLICAN"))
 			{
 				republicanCount = republicanCount + 1.0;
-				//System.out.println("Here");
 			}
 			i++;
 		}
 
-		//System.out.println("republicanCount = " + republicanCount);
-		//System.out.println("listLength = " + childrenList.length);
-
+		//calculate entropy based on the probablity of being an republican
 		republicanRate = republicanCount/((double)(childrenList.length));
 		entropyRepublican = B(republicanRate);	
 		return entropyRepublican;
@@ -457,7 +362,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// Don't forget to use the limit, when q makes this formula unstable.
 	public static double B(double q)
 	{
-		// TODO - implement this method
+		//take care of special cases
 		if(q==1)
 		{
 			return 0;
@@ -474,6 +379,7 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 		double success = q;
 		double fail = 1.0-q;
 
+		//calculate entropy based on the method mentioned on p704 on textbook
 		supriseSuccess = (-1) * success * (Math.log(success)/Math.log(2));
 		supriseFail = (-1) * fail * (Math.log(fail)/Math.log(2));
 
@@ -487,40 +393,34 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// decision tree correctly predicts.
 	public double runTests(String filename)
 	{
-		// TODO - implement this method
-		//learnFromTrainingData(filename);
-		
 		String result = "guess";
 		int correctCount = 0;
 		double correctRate = 0.0;
-		
+
+		//load test data
 		XML dataset = new XML("dataset");
 		dataset = p.loadXML(filename);
 		removeWhiteSpace(dataset);
-		
-		//recursiveBuildTree(dataset, tree);
-		
+
 		XML[] childrenList = dataset.getChildren();
 		//System.out.print(childrenList.length);
-		
+
+		//go throught the list, compare predict with reality. Keep track of
+		//correct count
 		int i = 0;
 		while(i < childrenList.length)
 		{
 			result = predict(childrenList[i], tree);
 			if(result.equalsIgnoreCase(childrenList[i].getString("party")))
 			{
-				//System.out.println("here");
-				//System.out.println(childrenList[i].getString("party"));
 				correctCount++;
 			}
 			i++;
 		}
-		//System.out.println(correctCount);
+		//calculate correct ratio
 		correctRate = (double)((double)(correctCount))/((double)(childrenList.length));
-		
+
 		return correctRate;
-		
-		//return 0.0;
 	}
 
 	// This method runs a single example through the decision tree, and then 
@@ -528,22 +428,15 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 	// If this example contains a party attribute, it should be ignored here.	
 	public String predict(XML example, XML decisionTree)
 	{
-		// TODO - implement this method
-		//System.out.println(example.getString("vote09"));
-		//System.out.println(example);
-		
 		String attribute = "abc";
 		XML curr =  new XML("curr");
-		//System.out.println(attribute.substring(0,3));
-		
+
+		//keep traversing the tree until reach a leaf
 		curr = decisionTree;
-		while(curr.getChild(0).getName().substring(0, 4).equalsIgnoreCase("vote"))
+		while(curr.getChild(0).getName().substring(0, 2).equalsIgnoreCase("vo"))
 		{
-			//System.out.println("curr is:" + curr.getName());
 			attribute = curr.getChild(0).getName().substring(0, 6);
-			//System.out.println("attribute is " + attribute);
-			//System.out.println("opinion is " + example.getString(attribute));
-			
+
 			if(example.getString(attribute).equalsIgnoreCase("YEA"))
 			{
 				curr = curr.getChild(0);
@@ -559,10 +452,9 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			}
 
 		}
-		
-		//System.out.println(curr.getChild(0).getName().substring(0, 3));
-		
-		if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("REP") || curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("DEM"))
+
+		//determine the party based on the tree
+		if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("REP") || curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("DEM") || curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("TIE"))
 		{
 			if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("REP"))
 			{
@@ -572,27 +464,22 @@ public class Yunhe_Liu_DecisionTree extends DrawableTree
 			{
 				return "DEMOCRAT";
 			}
+			else if(curr.getChild(0).getName().substring(0, 3).equalsIgnoreCase("TIE"))
+			{
+				//System.out.println("here");
+				return "TIE";
+			}
 			else
 			{
 				System.out.println("Error: input file invalid");
 				return "error";
 			}
-					
+
 		}
 		else
 		{
 			System.out.println("Error: input file invalid");
 			return "error";
 		}
-		
-		
-		
-		//System.out.println(decisionTree.getChild(0).getChild(0).getName());
-		//System.out.println(decisionTree.getChild(0).getChild(0));
-		//System.out.println(decisionTree.getChild(0).getChild(0).getParent());
-		
-		
-		//XML[] childrenList = decisionTree.getChildren();
-		//System.out.println(childrenList[0]);
 	}
 }
