@@ -11,3 +11,7 @@ After finish the search point class can move on the next half section.
 
 ### 11/14 3:29am
 Finished CompareTo method
+
+### 11/14 4:55am
+Finished raw implementation. Time to debug and re-implement
+
