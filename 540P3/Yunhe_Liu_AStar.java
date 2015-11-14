@@ -6,10 +6,17 @@ public class Yunhe_Liu_AStar
 	public ArrayList<SearchPoint> frontier;
 	public ArrayList<SearchPoint> explored;
 	
+	ArrayList<Map.Point> exploredPoints = new ArrayList<Map.Point>();
+	
 	// TODO - add any extra member fields that you would like here
+	public ArrayList<Map.Point> all;
 	public int option;
 	public Map.Point startPoint;
 	public Map.Point endPoint;
+	
+	public SearchPoint starting;
+	public SearchPoint ending;
+	public SearchPoint exploring;
 
 	public class SearchPoint implements Comparable<SearchPoint>
 	{
@@ -126,6 +133,10 @@ public class Yunhe_Liu_AStar
 			}
 		}
 		
+		//TODO: Read instruction again to debug. Bug here. I think the method
+		//is meant to be implemented in a different way. Make sure to modify
+		//the iscomplete function after modifying this function.
+		
 		// TODO - override this equals to help you check whether your ArrayLists
 		// already contain a SearchPoint referencing a given Map.Point
 		@Override
@@ -167,6 +178,13 @@ public class Yunhe_Liu_AStar
 		//float test = map.start.x;
 		startPoint = map.start;
 		endPoint = map.end;
+		
+		starting.x = startPoint.x;
+		starting.y = startPoint.y;
+		
+		frontier = new ArrayList<SearchPoint>();
+		frontier.add(starting);
+		all = map.allPoints;
 	}
 	
 	// TODO - implement this method to explore the single highest priority
@@ -175,6 +193,16 @@ public class Yunhe_Liu_AStar
 	// This method should not do anything, if your search is complete.
 	public void exploreNextNode() 
 	{
+		if(isComplete())
+		{
+			return;
+		}
+		
+		Collections.sort(frontier);
+		exploring = frontier.get(0);
+		frontier.remove(0);
+		explored = new ArrayList<SearchPoint>();
+		explored.add(exploring);
 		
 	}
 
@@ -182,20 +210,70 @@ public class Yunhe_Liu_AStar
 	// that represents the SearchPoints in your frontier.
 	public ArrayList<Map.Point> getFrontier()
 	{
-		return new ArrayList<Map.Point>();
+		int i = 0;
+		//TODO: initializing to null, possible bug
+		Map.Point curr = null;
+		for (i = 0; i < all.size(); i++)
+		{
+			if(all.get(i).x == exploring.x)
+			{
+				if(all.get(i).y == exploring.y)
+				{
+					curr = all.get(i);
+				}
+			}
+		}
+		
+		if(curr != null)
+		{
+			return curr.neighbors;
+		}
+		else
+		{
+			System.out.println("getFrontier error");
+			return null;
+		}
+		
 	}
 	
 	// TODO - implement this method to return an ArrayList of Map.Points
 	// that represents the SearchPoints that you have explored.
 	public ArrayList<Map.Point> getExplored()
 	{
-		return new ArrayList<Map.Point>();
+		
+		
+		int i = 0;
+		for (i = 0; i < explored.size(); i++)
+		{
+			int j = 0;
+			for (j = 0; j < all.size(); j++)
+			{
+				if(all.get(j).x == explored.get(i).x)
+				{
+					if(all.get(j).y == explored.get(i).y)
+					{
+						exploredPoints.add(all.get(j));
+					}
+				}
+			}
+		}
+		return exploredPoints;
 	}
 
+	//TODO: rethink the stopping condition
 	// TODO - implement this method to return true only after a solution
 	// has been found, or you have determined that no solution is possible.
 	public boolean isComplete()
 	{
+		ending.x = endPoint.x;
+		ending.y = endPoint.y;
+		
+		//TODO: Read instruction again to debug. Bug here
+		if(exploring.equals(ending)|| getFrontier().size() == 0)
+		{
+			return true;
+		}
+			
 		return false;
 	}
 
@@ -203,8 +281,10 @@ public class Yunhe_Liu_AStar
 	// that are along the path that you have found from the start to end.  
 	// These points must be in the ArrayList in the order that they are 
 	// traversed while moving along the path that you have found.
+	
+	//TODO: Re-implement
 	public ArrayList<Map.Point> getSolution()
 	{
-		return new ArrayList<Map.Point>();
+		return exploredPoints;
 	}	
 }
