@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class FIRSTNAME_LASTNAME_AStar 
+public class Yunhe_Liu_AStar 
 {		
 	public ArrayList<SearchPoint> frontier;
 	public ArrayList<SearchPoint> explored;
@@ -57,7 +57,7 @@ public class FIRSTNAME_LASTNAME_AStar
 	// and search, by adding the start point to your frontier.  The parameter
 	// H indicates which heuristic you should use while searching:
 	// 0: always estimate zero, 1: manhattan distance, 2: euclidean l2 distance
-	public FIRSTNAME_LASTNAME_AStar(Map map, int H)
+	public Yunhe_Liu_AStar(Map map, int H)
 	{
 		
 	}

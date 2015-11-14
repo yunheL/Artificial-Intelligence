@@ -4,7 +4,7 @@ import processing.core.*;
 
 public class Main extends PApplet
 {
-	FIRSTNAME_LASTNAME_AStar search; // your implementation of A* search
+	Yunhe_Liu_AStar search; // your implementation of A* search
 	Map map; // map to search for path between start and end points of
 	boolean enterPressed; // press enter to watch entire search until solution
 	boolean spaceWasDown; // press space repeatedly to step through search
@@ -68,7 +68,7 @@ public class Main extends PApplet
 			// and check for key press
 			if(keyPressed && (key == '0' || key == '1' || key == '2'))
 			{
-				search = new FIRSTNAME_LASTNAME_AStar(map,key-'0');
+				search = new Yunhe_Liu_AStar(map,key-'0');
 				map.dirtyPoints = false;
 			}
 			// display prompt to compute a new solution
