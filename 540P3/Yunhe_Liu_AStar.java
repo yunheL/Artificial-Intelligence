@@ -5,18 +5,38 @@ public class Yunhe_Liu_AStar
 {		
 	public ArrayList<SearchPoint> frontier;
 	public ArrayList<SearchPoint> explored;
-	// TODO - add any extra member fields that you would like here 
 	
+	// TODO - add any extra member fields that you would like here
+	public int option;
+	public Map.Point startPoint;
+	public Map.Point endPoint;
+
 	public class SearchPoint implements Comparable<SearchPoint>
 	{
+		//TODO: possible bug here that the way using non-static method
 		public Map.Point mapPoint;
+
 		// TODO - add any extra member fields or methods that you would like here
+		//public Map.Point start;
+		//public Map.Point end;
+		int x;
+		int y;
 		
 		// TODO - implement this method to return the minimum cost
 		// necessary to travel from the start point to here
 		public float g() 
 		{
-			return -1;
+			float currDis = 0;
+			float xDis = 0;
+			float yDis = 0;
+			float squareDis = 0;
+			
+			xDis = (mapPoint.x - startPoint.x) * (mapPoint.x - startPoint.x);
+			yDis = (mapPoint.y - startPoint.y) * (mapPoint.y - startPoint.y);
+			
+			squareDis = xDis + yDis;
+			currDis = (float)(Math.sqrt((double)(squareDis)));
+			return currDis;
 		}	
 		
 		// TODO - implement this method to return the heuristic estimate
@@ -24,7 +44,37 @@ public class Yunhe_Liu_AStar
 		// 0: always estimate zero, 1: manhattan distance, 2: euclidean l2 distance
 		public float h()
 		{
-			return -1;
+			float heuristic = 0;
+			if(option == 0)
+			{
+				//do nothing;
+			}
+			else if(option == 1)
+			{
+				float xDis = 0;
+				float yDis = 0;
+				
+				xDis = (endPoint.x - mapPoint.x);
+				yDis = (endPoint.y - mapPoint.y);
+				heuristic = xDis + yDis;
+			}
+			else if(option == 2)
+			{
+				float xDis = 0;
+				float yDis = 0;
+				float squareDis = 0;
+				
+				xDis = (endPoint.x - mapPoint.x) * (endPoint.x - mapPoint.x);
+				yDis = (endPoint.y - mapPoint.y) * (endPoint.y - mapPoint.y);
+				
+				squareDis = xDis + yDis;
+				heuristic = (float)(Math.sqrt((double)(squareDis)));
+			}
+			else
+			{
+				System.out.println("Option Error!");
+			}
+			return heuristic;
 		}
 		
 		// TODO - implement this method to return to final priority for this
@@ -32,7 +82,9 @@ public class Yunhe_Liu_AStar
 		// estimate of the remaining cost
 		public float f()
 		{
-			return -1;
+			float estimateSumCost = 0;
+			estimateSumCost = g() + h();
+			return estimateSumCost;
 		}
 		
 		// TODO - override this compareTo method to help sort the points in 
@@ -41,6 +93,7 @@ public class Yunhe_Liu_AStar
 		@Override
 		public int compareTo(SearchPoint other)
 		{
+			other.f();
 			return -1;
 		}
 		
@@ -49,6 +102,27 @@ public class Yunhe_Liu_AStar
 		@Override
 		public boolean equals(Object other)
 		{
+			int i = 0;
+			
+			//check Frontier list
+			for(i = 0; i < frontier.size(); i++)
+			{
+				//TODO: possible error using "==". May want consider .equals();
+				if(frontier.get(i) == other)
+				{
+					return true;
+				}
+			}
+			
+			//check explored list
+			for(i = 0; i < explored.size(); i++)
+			{
+				//TODO: possible error using "==". May want consider .equals();
+				if(explored.get(i) == other)
+				{
+					return true;
+				}
+			}
 			return false;
 		}		
 	}
@@ -59,7 +133,11 @@ public class Yunhe_Liu_AStar
 	// 0: always estimate zero, 1: manhattan distance, 2: euclidean l2 distance
 	public Yunhe_Liu_AStar(Map map, int H)
 	{
-		
+		option = H;
+		//float = start.mapPoint.x
+		//float test = map.start.x;
+		startPoint = map.start;
+		endPoint = map.end;
 	}
 	
 	// TODO - implement this method to explore the single highest priority
