@@ -14,26 +14,28 @@ public class Yunhe_Liu_AStar
 	public Map.Point startPoint;
 	public Map.Point endPoint;
 	
+	//TODO: debug code
 	public SearchPoint starting;
+	
 	public SearchPoint ending;
 	public SearchPoint exploring;
-
+	
 	public class SearchPoint implements Comparable<SearchPoint>
 	{
 		//TODO: possible bug here that the way using non-static method
 		public Map.Point mapPoint;
-
 		// TODO - add any extra member fields or methods that you would like here
-		//public Map.Point start;
-		//public Map.Point end;
-		float x = mapPoint.x;
-		float y = mapPoint.y;
+		public float x;
+		public float y;
 		
-		public SearchPoint(float x, float y)
+		public SearchPoint(Map.Point mapPoint)
 		{
-			this.x = x;
-			this.y = y;
+			this.mapPoint = mapPoint;
+			this.x = mapPoint.x;
+			this.y = mapPoint.y;
 		}
+		
+		
 		
 		// TODO - implement this method to return the minimum cost
 		// necessary to travel from the start point to here
@@ -107,7 +109,7 @@ public class Yunhe_Liu_AStar
 		public int compareTo(SearchPoint other)
 		{
 			//TODO: possible bug location, the new searchpoint may not be right
-			SearchPoint curr = new SearchPoint(x, y);
+			SearchPoint curr = new SearchPoint(mapPoint);
 			if(curr.f() > other.f())
 			{
 				return 1;
@@ -173,18 +175,27 @@ public class Yunhe_Liu_AStar
 	// 0: always estimate zero, 1: manhattan distance, 2: euclidean l2 distance
 	public Yunhe_Liu_AStar(Map map, int H)
 	{
+		System.out.println("here");
 		option = H;
-		//float = start.mapPoint.x
-		//float test = map.start.x;
 		startPoint = map.start;
 		endPoint = map.end;
 		
-		starting.x = startPoint.x;
-		starting.y = startPoint.y;
+		//TODO remove debug code
+		//starting.x = 0;
+		//starting.y = 0;
+		
+		//System.out.println("x is:" + startPoint.x);
+		starting = new SearchPoint(map.start);
+		System.out.println("x is:" + starting.x);
+		
+//		starting.x = startPoint.x;
+//		starting.y = startPoint.y;
 		
 		frontier = new ArrayList<SearchPoint>();
 		frontier.add(starting);
+		System.out.println("frontier x is" + frontier.get(0).x);
 		all = map.allPoints;
+		System.out.println("all(0).x is " + all.get(0).x);
 	}
 	
 	// TODO - implement this method to explore the single highest priority
@@ -199,7 +210,10 @@ public class Yunhe_Liu_AStar
 		}
 		
 		Collections.sort(frontier);
+		//exploring = new SearchPoint(frontier.get(0));
+		
 		exploring = frontier.get(0);
+		System.out.println("exploring.x is " + exploring.x);
 		frontier.remove(0);
 		explored = new ArrayList<SearchPoint>();
 		explored.add(exploring);
