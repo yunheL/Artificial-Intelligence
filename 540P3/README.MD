@@ -15,3 +15,5 @@ Finished CompareTo method
 ### 11/14 4:55am
 Finished raw implementation. Time to debug and re-implement
 
+### 11/14 6:54am
+Raw implementation
