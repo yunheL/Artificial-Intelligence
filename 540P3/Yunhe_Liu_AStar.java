@@ -19,8 +19,14 @@ public class Yunhe_Liu_AStar
 		// TODO - add any extra member fields or methods that you would like here
 		//public Map.Point start;
 		//public Map.Point end;
-		int x;
-		int y;
+		float x = mapPoint.x;
+		float y = mapPoint.y;
+		
+		public SearchPoint(float x, float y)
+		{
+			this.x = x;
+			this.y = y;
+		}
 		
 		// TODO - implement this method to return the minimum cost
 		// necessary to travel from the start point to here
@@ -31,8 +37,8 @@ public class Yunhe_Liu_AStar
 			float yDis = 0;
 			float squareDis = 0;
 			
-			xDis = (mapPoint.x - startPoint.x) * (mapPoint.x - startPoint.x);
-			yDis = (mapPoint.y - startPoint.y) * (mapPoint.y - startPoint.y);
+			xDis = (x - startPoint.x) * (x - startPoint.x);
+			yDis = (y - startPoint.y) * (y - startPoint.y);
 			
 			squareDis = xDis + yDis;
 			currDis = (float)(Math.sqrt((double)(squareDis)));
@@ -54,8 +60,8 @@ public class Yunhe_Liu_AStar
 				float xDis = 0;
 				float yDis = 0;
 				
-				xDis = (endPoint.x - mapPoint.x);
-				yDis = (endPoint.y - mapPoint.y);
+				xDis = (endPoint.x - x);
+				yDis = (endPoint.y - y);
 				heuristic = xDis + yDis;
 			}
 			else if(option == 2)
@@ -64,8 +70,8 @@ public class Yunhe_Liu_AStar
 				float yDis = 0;
 				float squareDis = 0;
 				
-				xDis = (endPoint.x - mapPoint.x) * (endPoint.x - mapPoint.x);
-				yDis = (endPoint.y - mapPoint.y) * (endPoint.y - mapPoint.y);
+				xDis = (endPoint.x - x) * (endPoint.x - x);
+				yDis = (endPoint.y - y) * (endPoint.y - y);
 				
 				squareDis = xDis + yDis;
 				heuristic = (float)(Math.sqrt((double)(squareDis)));
@@ -93,8 +99,31 @@ public class Yunhe_Liu_AStar
 		@Override
 		public int compareTo(SearchPoint other)
 		{
-			other.f();
-			return -1;
+			//TODO: possible bug location, the new searchpoint may not be right
+			SearchPoint curr = new SearchPoint(x, y);
+			if(curr.f() > other.f())
+			{
+				return 1;
+			}
+			else if(curr.f() > other.f())
+			{
+				return -1;
+			}
+			else
+			{
+				if(curr.g() > other.g())
+				{
+					return 1;
+				}
+				else if(curr.g() < other.g())
+				{
+					return -1;
+				}
+				else
+				{
+					return 0;
+				}
+			}
 		}
 		
 		// TODO - override this equals to help you check whether your ArrayLists
