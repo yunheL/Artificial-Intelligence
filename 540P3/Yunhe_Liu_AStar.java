@@ -23,6 +23,7 @@ public class Yunhe_Liu_AStar
 	public SearchPoint starting;
 	public SearchPoint ending;
 	public SearchPoint exploring;
+	public SearchPoint curr;
 	
 	public class Pair
 	{
@@ -60,17 +61,16 @@ public class Yunhe_Liu_AStar
 		public float g() 
 		{
 			float gValue;
-			SearchPoint curr = new SearchPoint(mapPoint);
 			
-			if(curr.prev == null)
+			if(this.prev == null)
 			{
 				gValue = 0;
 				//System.out.println("here1");
 			}
 			else
 			{
-				gValue = (float) (dist(curr, curr.prev) + curr.prev.g());
-				//System.out.println("here2");
+				gValue = (float) (dist(this, this.prev) + this.prev.g());
+				System.out.println("here2");
 				//System.out.println(dist(curr, curr.prev));
 			}
 			
@@ -268,6 +268,7 @@ public class Yunhe_Liu_AStar
 		starting = new SearchPoint(map.start);
 		ending = new SearchPoint(map.end);
 		exploring = new SearchPoint(map.start);
+		curr = new SearchPoint(map.start);
 		
 		
 		//System.out.println("x is:" + starting.x);
@@ -305,6 +306,7 @@ public class Yunhe_Liu_AStar
 		//exploring = new SearchPoint(frontier.get(0));
 		
 		exploring = frontier.get(0);
+		curr = frontier.get(0);
 		
 		/*
 		if((exploring.mapPoint.x == starting.mapPoint.x) && (exploring.mapPoint.y == starting.mapPoint.y))
@@ -321,7 +323,7 @@ public class Yunhe_Liu_AStar
 		explored.add(exploring);
 		
 		//TODO: debug code
-		//System.out.println(exploring.g());
+		System.out.println(exploring.g());
 		
 		//this part is good
 		int i = 0;
@@ -338,15 +340,26 @@ public class Yunhe_Liu_AStar
 		//the problem is with this part. The newly created traverse seach point always have the
 		//prev have the value of null
 		//update path
-		SearchPoint traverse = new SearchPoint(exploring.mapPoint);
-		while(traverse.prev != null)
+		//SearchPoint traverse = new SearchPoint(exploring.mapPoint);
+	
+		//SearchPoint temp = new SearchPoint(exploring.mapPoint);
+		
+		
+		
+		resetPath(SPpath);
+		SPpath.add(exploring);
+		
+		while(exploring.prev != null)
 		{
-			resetPath(SPpath);
-			SPpath.add(0, traverse);
+			
+			exploring = exploring.prev;
+			SPpath.add(0, exploring);
+			//System.out.println(SPpath.get(0).mapPoint.x + "," + SPpath.get(0).mapPoint.x);
+			
 		}
 		
 		//got empty path lists in the following test
-		//System.out.println(SPpath.toString());
+		//System.out.println(SPpath.get(0).mapPoint.x + "," + SPpath.get(0).mapPoint.x);
 			
 		/*
 		for(i = 0; )
@@ -450,7 +463,9 @@ public class Yunhe_Liu_AStar
 		
 		
 		//TODO: Read instruction again to debug. Bug here
-		if(exploring.equals(ending)|| getFrontier().size() == 0)
+		
+		
+		if(curr.equals(ending)|| getFrontier().size() == 0)
 		{
 			return true;
 		}
