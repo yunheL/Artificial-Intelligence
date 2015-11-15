@@ -37,3 +37,6 @@ was wrong because simply substracint one from another won't
 give you absolute value. And distance should be an absolute
 value. 
 Got that fixed as well.
+
+### 11/15 5:44am
+Finished Code clean up
