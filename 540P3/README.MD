@@ -40,3 +40,6 @@ Got that fixed as well.
 
 ### 11/15 5:44am
 Finished Code clean up
+
+### 11/15 6:00am
+Conclude project
