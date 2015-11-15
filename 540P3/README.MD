@@ -17,3 +17,6 @@ Finished raw implementation. Time to debug and re-implement
 
 ### 11/14 6:54am
 Raw implementation
+
+### 11/14 10:57pm
+First time partially worked
