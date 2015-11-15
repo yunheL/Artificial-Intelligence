@@ -28,3 +28,12 @@ NullPointException ressolved. Realize that the bug is with g() function. Current
 g() has value, refined path building
 Points still tend to get confused at crossings
 I think it is because of re-putting explored points to frontier
+
+### 11/15 5:00am
+Fixed the confusing at crossing problem by not re-putting
+explored points to frontier.
+Also found that heuristic option1 (the Manhattan heuristic)
+was wrong because simply substracint one from another won't
+give you absolute value. And distance should be an absolute
+value. 
+Got that fixed as well.
