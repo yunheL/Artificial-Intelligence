@@ -65,11 +65,16 @@ public class Yunhe_Liu_AStar
 			if(curr.prev == null)
 			{
 				gValue = 0;
+				//System.out.println("here1");
 			}
 			else
 			{
 				gValue = (float) (dist(curr, curr.prev) + curr.prev.g());
+				//System.out.println("here2");
+				//System.out.println(dist(curr, curr.prev));
 			}
+			
+			
 			
 			return gValue;
 			
@@ -273,6 +278,7 @@ public class Yunhe_Liu_AStar
 		frontier = new ArrayList<SearchPoint>();
 		explored = new ArrayList<SearchPoint>();
 		path = new ArrayList<Pair>();
+		SPpath = new ArrayList<SearchPoint>();
 		
 		frontier.add(starting);
 		
@@ -299,18 +305,38 @@ public class Yunhe_Liu_AStar
 		//exploring = new SearchPoint(frontier.get(0));
 		
 		exploring = frontier.get(0);
+		
+		/*
+		if((exploring.mapPoint.x == starting.mapPoint.x) && (exploring.mapPoint.y == starting.mapPoint.y))
+		{
+			for(int i = 0; i<exploring.mapPoint.neighbors.size(); i++)
+			{
+				exploring.mapPoint.neighbors.get(i).prev = starting;
+			}
+		}
+		*/
+		
 		//System.out.println("exploring.x is " + exploring.mapPoint.x);
 		frontier.remove(0);
 		explored.add(exploring);
 		
+		//TODO: debug code
+		//System.out.println(exploring.g());
+		
+		//this part is good
 		int i = 0;
 		for(i = 0; i < exploring.mapPoint.neighbors.size(); i++)
 		{
 			SearchPoint front = new SearchPoint(exploring.mapPoint.neighbors.get(i));
 			front.prev = exploring;
+			//System.out.println("exploring is [" + exploring.mapPoint.x + "," + exploring.mapPoint.y + "]");
+			//System.out.println("front.prev is [" + front.prev.mapPoint.x + "," + front.prev.mapPoint.y + "]");
 			frontier.add(front);
 		}
 		
+		
+		//the problem is with this part. The newly created traverse seach point always have the
+		//prev have the value of null
 		//update path
 		SearchPoint traverse = new SearchPoint(exploring.mapPoint);
 		while(traverse.prev != null)
@@ -318,6 +344,9 @@ public class Yunhe_Liu_AStar
 			resetPath(SPpath);
 			SPpath.add(0, traverse);
 		}
+		
+		//got empty path lists in the following test
+		//System.out.println(SPpath.toString());
 			
 		/*
 		for(i = 0; )
