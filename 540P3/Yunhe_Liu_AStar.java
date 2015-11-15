@@ -6,52 +6,88 @@ public class Yunhe_Liu_AStar
 	public ArrayList<SearchPoint> frontier;
 	public ArrayList<SearchPoint> explored;
 	
-	ArrayList<Map.Point> exploredPoints = new ArrayList<Map.Point>();
-	
 	// TODO - add any extra member fields that you would like here
+	public ArrayList<SearchPoint> SPpath;
+	public ArrayList<Pair> path;
+	
 	public ArrayList<Map.Point> all;
+	
+	//additional fields
 	public int option;
+	
+	//additional fields -> Map.Point
 	public Map.Point startPoint;
 	public Map.Point endPoint;
 	
-	//TODO: debug code
+	//additional fields -> SearchPoint
 	public SearchPoint starting;
-	
 	public SearchPoint ending;
 	public SearchPoint exploring;
+	
+	public class Pair
+	{
+		public Map.Point mapPoint;
+		public double dist;
+		
+		public Pair(Map.Point mapPoint, double dist)
+		{
+			this.mapPoint = mapPoint;
+			this.dist = dist;
+		}
+	}
 	
 	public class SearchPoint implements Comparable<SearchPoint>
 	{
 		//TODO: possible bug here that the way using non-static method
 		public Map.Point mapPoint;
 		// TODO - add any extra member fields or methods that you would like here
-		public float x;
-		public float y;
+		//public float x;
+		//public float y;
+		public double realDist;
+		public SearchPoint prev;
 		
 		public SearchPoint(Map.Point mapPoint)
 		{
+			
 			this.mapPoint = mapPoint;
-			this.x = mapPoint.x;
-			this.y = mapPoint.y;
+			//this.x = mapPoint.x;
+			//this.y = mapPoint.y;
+			this.prev = null;
 		}
-		
-		
 		
 		// TODO - implement this method to return the minimum cost
 		// necessary to travel from the start point to here
 		public float g() 
 		{
-			float currDis = 0;
-			float xDis = 0;
-			float yDis = 0;
-			float squareDis = 0;
+			float gValue;
+			SearchPoint curr = new SearchPoint(mapPoint);
 			
-			xDis = (x - startPoint.x) * (x - startPoint.x);
-			yDis = (y - startPoint.y) * (y - startPoint.y);
+			if(curr.prev == null)
+			{
+				gValue = 0;
+			}
+			else
+			{
+				gValue = (float) (dist(curr, curr.prev) + curr.prev.g());
+			}
 			
-			squareDis = xDis + yDis;
-			currDis = (float)(Math.sqrt((double)(squareDis)));
-			return currDis;
+			return gValue;
+			
+			/*
+			float additionalDist;
+			float gValue;
+			
+			SearchPoint curr = new SearchPoint(mapPoint);
+			
+			SearchPoint lastPoint = new SearchPoint(path.get(path.size()-1).mapPoint);
+			
+			additionalDist = (float)(dist(curr, lastPoint));
+			
+			gValue = (float)(path.get(path.size()-1).dist) + additionalDist;
+					
+			return gValue;
+			*/
+			
 		}	
 		
 		// TODO - implement this method to return the heuristic estimate
@@ -62,15 +98,15 @@ public class Yunhe_Liu_AStar
 			float heuristic = 0;
 			if(option == 0)
 			{
-				//do nothing;
+				return 0;
 			}
 			else if(option == 1)
 			{
 				float xDis = 0;
 				float yDis = 0;
 				
-				xDis = (endPoint.x - x);
-				yDis = (endPoint.y - y);
+				xDis = (endPoint.x - mapPoint.x);
+				yDis = (endPoint.y - mapPoint.y);
 				heuristic = xDis + yDis;
 			}
 			else if(option == 2)
@@ -79,8 +115,8 @@ public class Yunhe_Liu_AStar
 				float yDis = 0;
 				float squareDis = 0;
 				
-				xDis = (endPoint.x - x) * (endPoint.x - x);
-				yDis = (endPoint.y - y) * (endPoint.y - y);
+				xDis = (endPoint.x - mapPoint.x) * (endPoint.x - mapPoint.x);
+				yDis = (endPoint.y - mapPoint.y) * (endPoint.y - mapPoint.y);
 				
 				squareDis = xDis + yDis;
 				heuristic = (float)(Math.sqrt((double)(squareDis)));
@@ -114,7 +150,7 @@ public class Yunhe_Liu_AStar
 			{
 				return 1;
 			}
-			else if(curr.f() > other.f())
+			else if(curr.f() < other.f())
 			{
 				return -1;
 			}
@@ -144,6 +180,17 @@ public class Yunhe_Liu_AStar
 		@Override
 		public boolean equals(Object other)
 		{
+			if(other instanceof SearchPoint)
+			{
+				//other = (SearchPoint)(other);
+				//other.mapPoint;
+				if (mapPoint == ((SearchPoint)other).mapPoint)
+				{
+					return true;
+				}
+			}
+			return false;
+			/*
 			int i = 0;
 			
 			//check Frontier list
@@ -166,7 +213,33 @@ public class Yunhe_Liu_AStar
 				}
 			}
 			return false;
+			*/
 		}		
+	}
+	
+	public static double dist(SearchPoint A, SearchPoint B)
+	{
+		double dist = 0;
+		
+		double xDis = 0;
+		double yDis = 0;
+		double squareDis = 0;
+		
+		xDis = (A.mapPoint.x - B.mapPoint.x) * (A.mapPoint.x - B.mapPoint.x);
+		yDis = (A.mapPoint.y - B.mapPoint.y) * (A.mapPoint.y - B.mapPoint.y);
+		
+		squareDis = xDis + yDis;
+		dist = Math.sqrt(squareDis);
+
+		return dist;
+	}
+	
+	public static void resetPath(ArrayList<SearchPoint> path)
+	{
+		while(path.size() != 0)
+		{
+			path.remove(0);
+		}
 	}
 	
 	// TODO - implement this constructor to initialize your member variables
@@ -175,7 +248,8 @@ public class Yunhe_Liu_AStar
 	// 0: always estimate zero, 1: manhattan distance, 2: euclidean l2 distance
 	public Yunhe_Liu_AStar(Map map, int H)
 	{
-		System.out.println("here");
+		//System.out.println("here");
+		
 		option = H;
 		startPoint = map.start;
 		endPoint = map.end;
@@ -185,17 +259,29 @@ public class Yunhe_Liu_AStar
 		//starting.y = 0;
 		
 		//System.out.println("x is:" + startPoint.x);
+		
 		starting = new SearchPoint(map.start);
-		System.out.println("x is:" + starting.x);
+		ending = new SearchPoint(map.end);
+		exploring = new SearchPoint(map.start);
+		
+		
+		//System.out.println("x is:" + starting.x);
 		
 //		starting.x = startPoint.x;
 //		starting.y = startPoint.y;
 		
 		frontier = new ArrayList<SearchPoint>();
+		explored = new ArrayList<SearchPoint>();
+		path = new ArrayList<Pair>();
+		
 		frontier.add(starting);
-		System.out.println("frontier x is" + frontier.get(0).x);
+		
+		Pair startPair = new Pair(map.start, 0);
+		path.add(startPair);
+		
+		//System.out.println("frontier x is" + frontier.get(0).x);
 		all = map.allPoints;
-		System.out.println("all(0).x is " + all.get(0).x);
+		//System.out.println("all(0).x is " + all.get(0).x);
 	}
 	
 	// TODO - implement this method to explore the single highest priority
@@ -213,17 +299,54 @@ public class Yunhe_Liu_AStar
 		//exploring = new SearchPoint(frontier.get(0));
 		
 		exploring = frontier.get(0);
-		System.out.println("exploring.x is " + exploring.x);
+		//System.out.println("exploring.x is " + exploring.mapPoint.x);
 		frontier.remove(0);
-		explored = new ArrayList<SearchPoint>();
 		explored.add(exploring);
 		
+		int i = 0;
+		for(i = 0; i < exploring.mapPoint.neighbors.size(); i++)
+		{
+			SearchPoint front = new SearchPoint(exploring.mapPoint.neighbors.get(i));
+			front.prev = exploring;
+			frontier.add(front);
+		}
+		
+		//update path
+		SearchPoint traverse = new SearchPoint(exploring.mapPoint);
+		while(traverse.prev != null)
+		{
+			resetPath(SPpath);
+			SPpath.add(0, traverse);
+		}
+			
+		/*
+		for(i = 0; )
+			
+		double additionalDist = 0;
+		SearchPoint lastPoint = new SearchPoint(path.get(path.size()-1).mapPoint);
+		additionalDist = dist(exploring, lastPoint);
+		
+		Pair pairExploring = new Pair(exploring.mapPoint, (path.get(path.size()-1).dist + additionalDist));
+		
+		path.add(pairExploring);
+		*/
 	}
 
 	// TODO - implement this method to return an ArrayList of Map.Points
 	// that represents the SearchPoints in your frontier.
 	public ArrayList<Map.Point> getFrontier()
 	{
+		ArrayList<Map.Point> pointsFrontier = new ArrayList<Map.Point>();
+		
+		int i = 0;
+		for(i = 0; i < frontier.size(); i++)
+		{
+			//SearchPoint front = new SearchPoint(frontier.get(i).mapPoint);
+			pointsFrontier.add(frontier.get(i).mapPoint);
+		}
+		
+		return pointsFrontier;
+		/*
 		int i = 0;
 		//TODO: initializing to null, possible bug
 		Map.Point curr = null;
@@ -247,6 +370,7 @@ public class Yunhe_Liu_AStar
 			System.out.println("getFrontier error");
 			return null;
 		}
+		*/
 		
 	}
 	
@@ -255,7 +379,18 @@ public class Yunhe_Liu_AStar
 	public ArrayList<Map.Point> getExplored()
 	{
 		
+		ArrayList<Map.Point> pointsExplored = new ArrayList<Map.Point>();
 		
+		//explored = new ArrayList<SearchPoint>();
+		int i = 0;
+		for(i = 0; i < explored.size(); i++)
+		{
+			//SearchPoint front = new SearchPoint(frontier.get(i).mapPoint);
+			pointsExplored.add(explored.get(i).mapPoint);
+		}
+		
+		return pointsExplored;
+		/*
 		int i = 0;
 		for (i = 0; i < explored.size(); i++)
 		{
@@ -272,6 +407,7 @@ public class Yunhe_Liu_AStar
 			}
 		}
 		return exploredPoints;
+		*/
 	}
 
 	//TODO: rethink the stopping condition
@@ -279,8 +415,10 @@ public class Yunhe_Liu_AStar
 	// has been found, or you have determined that no solution is possible.
 	public boolean isComplete()
 	{
-		ending.x = endPoint.x;
-		ending.y = endPoint.y;
+		//ending.x = endPoint.x;
+		//ending.y = endPoint.y;
+		
+		
 		
 		//TODO: Read instruction again to debug. Bug here
 		if(exploring.equals(ending)|| getFrontier().size() == 0)
@@ -299,6 +437,16 @@ public class Yunhe_Liu_AStar
 	//TODO: Re-implement
 	public ArrayList<Map.Point> getSolution()
 	{
-		return exploredPoints;
+		ArrayList<Map.Point> solution = new ArrayList<Map.Point>();
+		
+		int i = 0;
+		for(i = 0; i < SPpath.size(); i++)
+		{
+			//SearchPoint front = new SearchPoint(frontier.get(i).mapPoint);
+			solution.add(SPpath.get(i).mapPoint);
+		}
+		
+		//pointsExplored.add(endPoint);
+		return solution;
 	}	
 }
