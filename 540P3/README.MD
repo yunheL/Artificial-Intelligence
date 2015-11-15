@@ -23,3 +23,8 @@ First time partially worked
 
 ### 11/14 11:53PM
 NullPointException ressolved. Realize that the bug is with g() function. Currently the g() is always giving the value 0. And that is because the bug in line 338. Where we try to add things in to the SPpath list. The newly created SearchPoint always have the prev field as null so nothing could be added into the list.
+
+### 11/15 4:14am
+g() has value, refined path building
+Points still tend to get confused at crossings
+I think it is because of re-putting explored points to frontier
