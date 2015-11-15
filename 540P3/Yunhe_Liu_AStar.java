@@ -110,8 +110,12 @@ public class Yunhe_Liu_AStar
 				float xDis = 0;
 				float yDis = 0;
 				
-				xDis = (endPoint.x - mapPoint.x);
-				yDis = (endPoint.y - mapPoint.y);
+				xDis = (endPoint.x - this.mapPoint.x) * (endPoint.x - this.mapPoint.x);
+				yDis = (endPoint.y - this.mapPoint.y) * (endPoint.y - this.mapPoint.y);
+				
+				xDis = (float)(Math.sqrt((double)(xDis)));
+				yDis = (float)(Math.sqrt((double)(yDis)));
+				
 				heuristic = xDis + yDis;
 			}
 			else if(option == 2)
@@ -120,8 +124,8 @@ public class Yunhe_Liu_AStar
 				float yDis = 0;
 				float squareDis = 0;
 				
-				xDis = (endPoint.x - mapPoint.x) * (endPoint.x - mapPoint.x);
-				yDis = (endPoint.y - mapPoint.y) * (endPoint.y - mapPoint.y);
+				xDis = (endPoint.x - this.mapPoint.x) * (endPoint.x - this.mapPoint.x);
+				yDis = (endPoint.y - this.mapPoint.y) * (endPoint.y - this.mapPoint.y);
 				
 				squareDis = xDis + yDis;
 				heuristic = (float)(Math.sqrt((double)(squareDis)));
@@ -150,7 +154,7 @@ public class Yunhe_Liu_AStar
 		public int compareTo(SearchPoint other)
 		{
 			//TODO: possible bug location, the new searchpoint may not be right
-			SearchPoint curr = new SearchPoint(mapPoint);
+			SearchPoint curr = new SearchPoint(this.mapPoint);
 			if(curr.f() > other.f())
 			{
 				return 1;
@@ -189,7 +193,7 @@ public class Yunhe_Liu_AStar
 			{
 				//other = (SearchPoint)(other);
 				//other.mapPoint;
-				if (mapPoint == ((SearchPoint)other).mapPoint)
+				if (this.mapPoint == ((SearchPoint)other).mapPoint)
 				{
 					return true;
 				}
@@ -245,6 +249,18 @@ public class Yunhe_Liu_AStar
 		{
 			path.remove(0);
 		}
+	}
+	
+	public static boolean inList(ArrayList<SearchPoint> list, SearchPoint point)
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			if((list.get(i).mapPoint.x == point.mapPoint.x) && (list.get(i).mapPoint.y == point.mapPoint.y))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	// TODO - implement this constructor to initialize your member variables
@@ -333,7 +349,11 @@ public class Yunhe_Liu_AStar
 			front.prev = exploring;
 			//System.out.println("exploring is [" + exploring.mapPoint.x + "," + exploring.mapPoint.y + "]");
 			//System.out.println("front.prev is [" + front.prev.mapPoint.x + "," + front.prev.mapPoint.y + "]");
-			frontier.add(front);
+			if(!inList(explored, front))
+			{
+				frontier.add(front);
+			}
+			//frontier.add(front);
 		}
 		
 		
