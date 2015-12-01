@@ -15,7 +15,7 @@ public class Main extends PApplet
 	
 	public void setup()
 	{
-		dtree = new FIRSTNAME_LASTNAME_Resolution(this,inputXML);
+		dtree = new Yunhe_Liu_Resolution(this,inputXML);
 		keyWasDown = true;
 		status = "Logic Loaded";
 	}

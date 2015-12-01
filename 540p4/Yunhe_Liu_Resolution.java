@@ -1,9 +1,9 @@
 import processing.core.PApplet;
 import processing.data.XML;
 
-public class FIRSTNAME_LASTNAME_Resolution extends DrawableTree
+public class Yunhe_Liu_Resolution extends DrawableTree
 {
-	public FIRSTNAME_LASTNAME_Resolution(PApplet p, XML tree) 
+	public Yunhe_Liu_Resolution(PApplet p, XML tree) 
 	{ 
 		super(p); 
 		this.tree = tree; 
