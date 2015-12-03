@@ -102,8 +102,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	 * This helper recursively traverse through the tree
 	 * and replace conditions with corresponding logic
 	 */
-	public void traverseTreeRemoveConditions(XML curr)
-	{
+	public void traverseTreeRemoveConditions(XML curr){
 		//base case
 		if(curr == null)
 			return;
@@ -150,13 +149,126 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 				childrenList[i].getChild(0).addChild(leftLogic);
 			}
 			else{
-				//keep traversing if childrenList[i] is not bicondition
+				//keep traversing if childrenList[i] is not condition
 				traverseTreeRemoveConditions(childrenList[i]);
 			}
 			//don't forget the increase counter!
 			i++;
 		}
 	}
+
+	/*
+	 * This helper recursively traverse through the tree
+	 * and moves not correspondingly
+	 */
+	public void traverseTreeMoveNot(XML curr)
+	{
+		//base case
+		if(curr == null)
+			return;
+
+		XML[] childrenList = curr.getChildren();
+
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//if current node is "not"
+			if(childrenList[i].getName().equalsIgnoreCase("not") )
+			{
+				//TODO - remove debug code
+				//System.out.println("here");
+
+				//keep traversing "not" children list
+				traverseTreeMoveNot(childrenList[i]);
+
+				//move not
+				//validation: make sure childrenList[i] has 1 children
+				if(childrenList[i].getChildCount() != 1)
+				{
+					System.out.println("Move not children"
+							+ " count error");
+					return;
+				}
+				
+				//TODO - double check referencing by pointer
+				//get the child and parent of "not" (childList[i])
+				XML childOfNot = childrenList[i].getChild(0);
+				XML parent = childrenList[i].getParent();
+				
+				//if childOfNot is "not"
+				if(childOfNot.getName().equalsIgnoreCase("not"))
+				{
+					XML grandChild = childOfNot.getChild(0);
+					parent.removeChild(childrenList[i]);
+					parent.addChild(grandChild);
+				}
+				//if childOfNot is "and"
+				else if(childOfNot.getName().equalsIgnoreCase("and"))
+				{
+					//get the left and right logic of childOfNot
+					XML leftLogic = childOfNot.getChild(0);
+					XML rightLogic = childOfNot.getChild(1);
+					
+					//eliminate condition connect by "or"
+					childrenList[i].setName("or");
+					
+					//remove all the children for reconstruction
+					removeAllChildren(childrenList[i]);
+					
+					//add two children of "or"
+					childrenList[i].addChild("not");
+					childrenList[i].addChild("not");
+					
+					//add left and right logic back
+					childrenList[i].getChild(0).addChild(leftLogic);
+					childrenList[i].getChild(1).addChild(rightLogic);
+					
+					//recursively processing the updated tree
+					traverseTreeMoveNot(childrenList[i]);
+				}
+				//if childOfNot is "or"
+				else if(childOfNot.getName().equalsIgnoreCase("or"))
+				{	
+					//get the left and right logic of childOfNot
+					XML leftLogic = childOfNot.getChild(0);
+					XML rightLogic = childOfNot.getChild(1);
+					
+					//eliminate condition connect by "or"
+					childrenList[i].setName("and");
+					
+					//remove all the children for reconstruction
+					removeAllChildren(childrenList[i]);
+					
+					//add two children of "or"
+					childrenList[i].addChild("not");
+					childrenList[i].addChild("not");
+					
+					//add left and right logic back
+					childrenList[i].getChild(0).addChild(leftLogic);
+					childrenList[i].getChild(1).addChild(rightLogic);
+					
+					//recursively processing the updated tree
+					traverseTreeMoveNot(childrenList[i]);
+				}
+				/* 
+				 * Never mind, it looks like it can be the literals as well.
+				//else we have a problem
+				else
+				{
+					System.out.println("Error in moving not, not child type");
+					System.out.println("It is " + childOfNot.getName());
+				}
+				*/
+			}
+			else{
+				//keep traversing if childrenList[i] is not "not"
+				traverseTreeMoveNot(childrenList[i]);
+			}
+			//don't forget to increase counter!
+			i++;
+		}
+	}
+
 
 	public void eliminateBiconditions()
 	{
@@ -177,7 +289,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement the second step in converting logic in tree to CNF:
 		// Replace all conditions with truth preserving disjunctions.
-		
+
 		//call helper method to eliminate conditions
 		traverseTreeRemoveConditions(tree);
 
@@ -189,6 +301,12 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement the third step in converting logic in tree to CNF:
 		// Move negations in a truth preserving way to apply only to literals.
+		
+		//call helper method to eliminate conditions
+		traverseTreeMoveNot(tree);
+
+		//set dirtyTree flag for display
+		dirtyTree = true;
 	}
 
 	public void distributeOrsOverAnds()
