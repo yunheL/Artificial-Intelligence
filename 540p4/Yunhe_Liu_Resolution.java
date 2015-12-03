@@ -2,18 +2,115 @@ import processing.core.PApplet;
 import processing.data.XML;
 
 public class Yunhe_Liu_Resolution extends DrawableTree
-{
+{	
 	public Yunhe_Liu_Resolution(PApplet p, XML tree) 
 	{ 
 		super(p); 
 		this.tree = tree; 
 		dirtyTree = true;
 	}
+	
+	/*
+	 * This helper method removes all the children of the
+	 * XML node passed in to the method
+	 */
+	public void removeAllChildren(XML data)
+	{
+		//base case for recursion
+		if (data == null)	
+			return;
+
+		//The list contains all the children of the current
+		//node.
+		XML[] childrenList = data.getChildren();
+
+		//remove all the children of the passed in XML node
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			data.removeChild(childrenList[i]);
+			i++;
+		}
+	}
+	
+	/*
+	 * This helper recursively traverse through the tree
+	 * and replace biconditions with two conditions
+	 */
+	public void traverseTreeRemoveBiconditions(XML curr)
+	{
+		//base case
+		if(curr == null)
+			return;
 		
+		XML[] childrenList = curr.getChildren();
+		
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//if current node is bicondition
+			if(childrenList[i].getName().equalsIgnoreCase("bicondition") )
+			{
+				//TODO - remove debug code
+				//System.out.println("here");
+				
+				//keep traversing biconditional children list
+				traverseTreeRemoveBiconditions(childrenList[i]);
+				
+				//remove bicondition
+				//validation: make sure childrenList[i] has at least
+				//two children
+				if(childrenList[i].getChildCount() != 2)
+				{
+					System.out.println("remove bicondition children"
+							+ " count error");
+					return;
+				}
+				
+				//get the left and right logic of the bicondition
+				XML leftLogic = childrenList[i].getChild(0);
+				XML rightLogic = childrenList[i].getChild(1);
+				
+				//eliminate biconditoin connect by "and"
+				childrenList[i].setName("and");
+				
+				//remove all the children for reconstruction
+				removeAllChildren(childrenList[i]);
+				
+				//add two conditon children
+				childrenList[i].addChild("condition");
+				childrenList[i].addChild("condition");
+				
+				//add logic to the left condition
+				childrenList[i].getChild(0).addChild(leftLogic);
+				childrenList[i].getChild(0).addChild(rightLogic);
+				
+				//add logic to the right condition
+				childrenList[i].getChild(1).addChild(rightLogic);
+				childrenList[i].getChild(1).addChild(leftLogic);
+			}
+			else{
+				//keep traversing if childrenList[i] is not bicondition
+				traverseTreeRemoveBiconditions(childrenList[i]);
+			}
+			//don't forget the increase counter!
+			i++;
+		}
+	}
+	
 	public void eliminateBiconditions()
 	{
 		// TODO - Implement the first step in converting logic in tree to CNF:
 		// Replace all biconditions with truth preserving conjunctions of conditions.
+		
+		//TODO - remove debug code
+		//System.out.println("tree is " + tree);
+		
+		//call helper method to eliminate Biconditions
+		traverseTreeRemoveBiconditions(tree);
+		
+		//set dirtyTree flag for display
+		dirtyTree = true;
 	}	
 	
 	public void eliminateConditions()
