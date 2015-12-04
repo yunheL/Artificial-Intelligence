@@ -32,7 +32,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			i++;
 		}
 	}
-	
+
 	/*
 	 * This helper method removes all the children that has the name "name" of the
 	 * XML node passed in to the method
@@ -228,7 +228,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			{
 				//TODO - remove debug code
 				//System.out.println("here");
-				
+
 				//recursively processing the updated tree
 				traverseTreeMoveNot(childrenList[i]);
 
@@ -357,34 +357,34 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 				//get the left and right logic of the condition
 				XML leftLogic = childrenList[i].getChild(0);
 				XML rightLogic = childrenList[i].getChild(1);
-				
+
 				//boolean leftFixed = false;
-				
+
 				//right child is "and"
 				if(rightLogic.getName().equalsIgnoreCase("and"))
 				{
 					//System.out.println("Here1");
 					XML leftGrandChild = childrenList[i].getChild(1).getChild(0);
 					XML rightGrandChild = childrenList[i].getChild(1).getChild(1);
-					
+
 					//eliminate "or" connect by "and"
 					childrenList[i].setName("and");
-					
+
 					//remove all the children for reconstruction
 					removeAllChildren(childrenList[i]);
-					
+
 					//add two children of "or"
 					childrenList[i].addChild("or");
 					childrenList[i].addChild("or");
-					
+
 					//add child to left child
 					childrenList[i].getChild(0).addChild(leftLogic);
 					childrenList[i].getChild(0).addChild(leftGrandChild);
-					
+
 					//add child to right child
 					childrenList[i].getChild(1).addChild(leftLogic);
 					childrenList[i].getChild(1).addChild(rightGrandChild);
-					
+
 					//leftFixed = true;
 					traverseTreeRemoveConditions(childrenList[i]);
 				}
@@ -394,28 +394,28 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 					//System.out.println("Here2");
 					XML leftGrandChild = childrenList[i].getChild(0).getChild(0);
 					XML rightGrandChild = childrenList[i].getChild(0).getChild(1);
-					
+
 					//eliminate "or" connect by "and"
 					childrenList[i].setName("and");
-					
+
 					//remove all the children for reconstruction
 					removeAllChildren(childrenList[i]);
-					
+
 					//add two children of "or"
 					childrenList[i].addChild("or");
 					childrenList[i].addChild("or");
-					
+
 					//add child to left child
 					childrenList[i].getChild(0).addChild(leftGrandChild);
 					childrenList[i].getChild(0).addChild(rightLogic);
-					
+
 					//add child to right child
 					childrenList[i].getChild(1).addChild(rightGrandChild);
 					childrenList[i].getChild(1).addChild(rightLogic);
-					
+
 					traverseTreeRemoveConditions(childrenList[i]);
 				}
-				
+
 				//keep traversing both children in case original both
 				//children were "and"
 				//System.out.println("here");
@@ -433,8 +433,8 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			i++;
 		}
 	}
-	
-	public void traverseTreeCreateNNary(XML curr)
+
+	public void traverseTreeCreateNNary(XML curr, String name)
 	{
 		//System.out.println("here");
 		//base case
@@ -448,71 +448,107 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		{
 			//System.out.println("here1");
 			//if current node is bicondition
-			if(childrenList[i].getName().equalsIgnoreCase("and") )
+			if(childrenList[i].getName().equalsIgnoreCase(name) )
 			{
 				//System.out.println(i);
-				
+
 				//TODO - remove debug code
 				//System.out.println("here2");
 
 				//keep traversing recusively
-				traverseTreeCreateNNary(childrenList[i]);
+				traverseTreeCreateNNary(childrenList[i], name);
 
 				//create N-nary
 				//validation: make sure childrenList[i] has at least
 				//two children
+				/*
 				if(childrenList[i].getChildCount() < 2)
 				{
 					System.out.println("remove bicondition children"
 							+ " count error");
 					return;
 				}
+				 */
 
 				XML[] subChildrenList = childrenList[i].getChildren();
-				
+
 				int j = 0;
 				while(j < subChildrenList.length)
 				{
-					if(subChildrenList[j].getName().equalsIgnoreCase("and"))
+					if(subChildrenList[j].getName().equalsIgnoreCase(name))
 					{
 						//TODO - remove debug code
 						//System.out.println("here3");
 						XML[] grandChildrenList = subChildrenList[i].getChildren();
-						
+
 						int k = 0;
 						for(k = 0; k<grandChildrenList.length; k++)
 						{
 							childrenList[i].addChild(grandChildrenList[k]);
 						}
-						
+
 					}
 					j++;
 				}
-				removeSpecificChildren(childrenList[i], "and");
-				
-				/*
-				//eliminate bicondition connect by "and"
-				childrenList[i].setName("and");
+				removeSpecificChildren(childrenList[i], name);
 
-				//remove all the children for reconstruction
-				removeAllChildren(childrenList[i]);
-
-				//add two conditon children
-				childrenList[i].addChild("condition");
-				childrenList[i].addChild("condition");
-
-				//add logic to the left condition
-				childrenList[i].getChild(0).addChild(leftLogic);
-				childrenList[i].getChild(0).addChild(rightLogic);
-
-				//add logic to the right condition
-				childrenList[i].getChild(1).addChild(rightLogic);
-				childrenList[i].getChild(1).addChild(leftLogic);
-				*/
 			}
 			else{
 				//keep traversing if childrenList[i] is not bicondition
-				traverseTreeCreateNNary(childrenList[i]);
+				traverseTreeCreateNNary(childrenList[i], name);
+			}
+			//don't forget the increase counter!
+			i++;
+		}
+	}
+
+	public void traverseTreeRemoveReduendentLiteral(XML curr)
+	{
+		//base case
+		if(curr == null)
+			return;
+
+		XML[] childrenList = curr.getChildren();
+
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//if current node is clause
+			if(childrenList[i].getName().equalsIgnoreCase("or") )
+			{
+				//TODO - remove debug code
+				//System.out.println("here");
+
+				//keep traversing
+				traverseTreeRemoveReduendentLiteral(childrenList[i]);
+
+				//remove bicondition
+				XML[] subChildrenList = childrenList[i].getChildren();
+
+				int j = 0;
+				while(j < subChildrenList.length)
+				{
+					if(subChildrenList[j].getName().equalsIgnoreCase("not"))
+					{
+						childrenList[i].removeChild(subChildrenList[j]);
+						if(!clauseContainsLiteral(childrenList[i], getAtomFromLiteral(subChildrenList[j]), true))
+						{
+							childrenList[i].addChild(subChildrenList[j]);
+						}
+					}
+					else
+					{
+						childrenList[i].removeChild(subChildrenList[j]);
+						if(!clauseContainsLiteral(childrenList[i], getAtomFromLiteral(subChildrenList[j]), false))
+						{
+							childrenList[i].addChild(subChildrenList[j]);
+						}
+					}
+				}
+			}
+			else{
+				//keep traversing if childrenList[i] is not bicondition
+				traverseTreeRemoveReduendentLiteral(childrenList[i]);
 			}
 			//don't forget the increase counter!
 			i++;
@@ -531,14 +567,14 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		//TODO - Debug code reverse
 		traverseTreeRemoveBiconditions(tree);
 
-		
-		
+
+
 		//TODO - Debug Code
 		//traverseTreeCreateNNary(tree);
-		
+
 		//set dirtyTree flag for display
 		dirtyTree = true;
-		
+
 		/*
 		//TODO - Debug code
 		XML neg = new XML("not");
@@ -547,8 +583,8 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		System.out.println("Is negated?: " + isLiteralNegated(pos));
 		System.out.println("Atom fom neg: " + getAtomFromLiteral(neg));
 		System.out.println("Atom fom pos: " + getAtomFromLiteral(pos));
-		*/
-		
+		 */
+
 		/*
 		//TODO - Debug code
 		XML Clause = new XML ("or");
@@ -558,9 +594,9 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		Clause.addChild(child0);
 		neg.addChild(child1);
 		Clause.addChild(neg);
-		
+
 		System.out.println("should be true: " + clauseIsTautology(Clause));
-		
+
 		//test case need to be revised to test differenment methods
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
 		System.out.println("should be true: " + clauseContainsLiteral(Clause, "a", false));
@@ -568,7 +604,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", true));
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", false));
-		
+
 		XML set = new XML ("and");
 		XML clause1 = new XML ("or");
 		XML clause2 = new XML ("or");
@@ -584,7 +620,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		clause2.addChild(neg);
 		set.addChild(clause1);
 		set.addChild(clause2);
-		
+
 		XML neg2 = new XML("not");
 		XML clause3 = new XML ("or");
 		XML clause4 = new XML ("or");
@@ -592,40 +628,40 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		XML clause6 = new XML ("or");
 		XML clause7 = new XML ("or");
 		XML clause8 = new XML ("or");
-		
+
 		XML liter5 = new XML ("a");
 		XML liter6 = new XML ("b");
 		XML liter7 = new XML ("c");
 		XML liter8 = new XML ("d");
 		XML liter9 = new XML ("f");
-		
+
 		neg2.addChild(liter8);
 		clause3.addChild(liter6);
 		clause3.addChild(liter5);
-		
+
 		clause4.addChild(liter5);
 		clause4.addChild(liter6);
-		
+
 		clause5.addChild(liter5);
 		clause5.addChild(liter7);
-		
+
 		clause6.addChild(liter5);
 		clause6.addChild(liter9);
-		
+
 		clause7.addChild(liter7);
 		clause7.addChild(neg2);
-		
-		
-		
+
+
+
 		System.out.println("set is: " + set.toString());
 		System.out.println("clause7 is: " + clause7.toString());
-		
+
 		System.out.println("should be true: " + setContainsClause(set, clause3));
 		System.out.println("should be true: " + setContainsClause(set, clause4));
 		System.out.println("should be false: " + setContainsClause(set, clause5));
 		System.out.println("should be false: " + setContainsClause(set, clause6));
 		System.out.println("should be true: " + setContainsClause(set, clause7));
-		*/
+		 */
 	}	
 
 	public void eliminateConditions()
@@ -656,7 +692,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement the fourth step in converting logic in tree to CNF:
 		// Move negations in a truth preserving way to apply only to literals.
-		
+
 		//call helper method to eliminate conditions
 		traverseTreeDistributeOr(tree);
 
@@ -675,16 +711,20 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		// redundant clauses from the tree.
 		// 3) Also remove any clauses that are always true (tautologies)
 		// from your tree to help speed up resolution.
-		
-		//call helper method to eliminate conditions
-		traverseTreeCreateNNary(tree);
 
-		
+		//call helper method to eliminate conditions
+		//attention that the sequence of or first then and is important
+		traverseTreeCreateNNary(tree, "or");
+		traverseTreeCreateNNary(tree, "and");
+
+		//traverseTreeRemoveReduendentLiteral(tree);
+		//System.out.println(tree);
+
 		//removeSpecificChildren(tree, "and");
 		//set dirtyTree flag for display
 		dirtyTree = true;
-		
-		
+
+
 	}	
 
 	public boolean applyResolution()
@@ -705,6 +745,9 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		// resulting resolvent.  If there is a conflict, you will simply be
 		// returning an XML node with zero children.  If the two clauses cannot
 		// be resolved, then return null instead.
+		
+		
+		
 		return null;
 	}	
 
@@ -722,15 +765,15 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		{
 			return true;
 		}
-		
+
 		return false; 
-		
+
 	}
 
 	public String getAtomFromLiteral(XML literal) 
 	{ 
 		// TODO - Implement to return the name of the atom in this literal as a string.
-		
+
 		if(isLiteralNegated(literal))
 		{
 			return literal.getChild(0).getName();
@@ -770,7 +813,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 				{
 					//System.out.println("childrenList[i] is: " + childrenList[i].getName());
 					//System.out.println("its child[0] is: " + childrenList[i].getChild(0));
-					
+
 					if(childrenList[i].getChild(0) != null)
 					{
 						if(childrenList[i].getChild(0).getName().equalsIgnoreCase(atom))
@@ -796,16 +839,16 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		XML[] childrenList = set.getChildren();
 		//System.out.println("childrenList length is: "+ childrenList.length);
 		boolean contains = false;
-		
+
 		int i = 0;
 		while(i < childrenList.length)
 		{
 			XML[] subChildrenList = childrenList[i].getChildren();
 			XML[] clauseChildrenList = clause.getChildren();
-			
+
 			//System.out.println("subChildrenList length is: "+subChildrenList.length);
 			//System.out.println("clauseChildrenList length is: "+clauseChildrenList.length);
-			
+
 			if(subChildrenList.length == clauseChildrenList.length)
 			{
 				int j = 0;
@@ -819,12 +862,12 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 					{
 						contains = clauseContainsLiteral(clause, getAtomFromLiteral(subChildrenList[i]), false);
 					}
-					
+
 					if(contains == false)
 					{
 						break;
 					}
-				
+
 					j++;
 				}
 			}
@@ -832,15 +875,15 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			{
 				contains = false;
 			}
-			
+
 			if(contains == true)
 			{
 				return true;
 			}
-			
+
 			i++;
 		}
-		
+
 		return false;
 	}
 
@@ -850,7 +893,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		// along with the negated form of that same literal.  Otherwise, return false.
 		XML[] childrenList = clause.getChildren();
 		boolean isTautology = false;
-		
+
 		int i = 0;
 		while(i < childrenList.length)
 		{
@@ -862,15 +905,15 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			{
 				isTautology = clauseContainsLiteral(clause, getAtomFromLiteral(childrenList[i]), true);
 			}
-			
+
 			if(isTautology == true)
 			{
 				return true;
 			}
-			
+
 			i++;
 		}
 		return false;
 	}
-	
+
 }
