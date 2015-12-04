@@ -293,6 +293,116 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		}
 	}
 
+	/*
+	 * This helper recursively traverse through the tree
+	 * and replace conditions with corresponding logic
+	 */
+	public void traverseTreeDistributeOr(XML curr){
+		//base case
+		if(curr == null)
+			return;
+
+		XML[] childrenList = curr.getChildren();
+
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//if current node is or
+			if(childrenList[i].getName().equalsIgnoreCase("or"))
+			{
+				//TODO - remove debug code
+				//System.out.println("here");
+
+				//keep traversing its children
+				traverseTreeDistributeOr(childrenList[i]);
+
+				//distribute or
+				//validation: make sure childrenList[i] has at least
+				//two children
+				if(childrenList[i].getChildCount() != 2)
+				{
+					System.out.println("remove condition children"
+							+ " count error");
+					return;
+				}
+
+				//get the left and right logic of the condition
+				XML leftLogic = childrenList[i].getChild(0);
+				XML rightLogic = childrenList[i].getChild(1);
+				
+				//boolean leftFixed = false;
+				
+				//right child is "and"
+				if(rightLogic.getName().equalsIgnoreCase("and"))
+				{
+					//System.out.println("Here1");
+					XML leftGrandChild = childrenList[i].getChild(1).getChild(0);
+					XML rightGrandChild = childrenList[i].getChild(1).getChild(1);
+					
+					//eliminate "or" connect by "and"
+					childrenList[i].setName("and");
+					
+					//remove all the children for reconstruction
+					removeAllChildren(childrenList[i]);
+					
+					//add two children of "or"
+					childrenList[i].addChild("or");
+					childrenList[i].addChild("or");
+					
+					//add child to left child
+					childrenList[i].getChild(0).addChild(leftLogic);
+					childrenList[i].getChild(0).addChild(leftGrandChild);
+					
+					//add child to right child
+					childrenList[i].getChild(1).addChild(leftLogic);
+					childrenList[i].getChild(1).addChild(rightGrandChild);
+					
+					//leftFixed = true;
+				}
+				//left child is "and"
+				else if(leftLogic.getName().equalsIgnoreCase("and"))
+				{
+					//System.out.println("Here2");
+					XML leftGrandChild = childrenList[i].getChild(0).getChild(0);
+					XML rightGrandChild = childrenList[i].getChild(0).getChild(1);
+					
+					//eliminate "or" connect by "and"
+					childrenList[i].setName("and");
+					
+					//remove all the children for reconstruction
+					removeAllChildren(childrenList[i]);
+					
+					//add two children of "or"
+					childrenList[i].addChild("or");
+					childrenList[i].addChild("or");
+					
+					//add child to left child
+					childrenList[i].getChild(0).addChild(leftGrandChild);
+					childrenList[i].getChild(0).addChild(rightLogic);
+					
+					//add child to right child
+					childrenList[i].getChild(1).addChild(rightGrandChild);
+					childrenList[i].getChild(1).addChild(rightLogic);
+				}
+				
+				//keep traversing both children in case original both
+				//children were "and"
+				//System.out.println("here");
+				//System.out.println("Child0 is: " + childrenList[i].getChild(0));
+				//System.out.println("child1 is: " + childrenList[i].getChild(1));
+				//traverseTreeDistributeOr(childrenList[i].getChild(0));
+				//traverseTreeDistributeOr(childrenList[i].getChild(1));
+				traverseTreeRemoveConditions(childrenList[i]);
+			}
+			else{
+				//keep traversing if childrenList[i] is not condition
+				traverseTreeRemoveConditions(childrenList[i]);
+			}
+			//don't forget the increase counter!
+			i++;
+		}
+	}
+	
 
 	public void eliminateBiconditions()
 	{
@@ -337,6 +447,12 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement the fourth step in converting logic in tree to CNF:
 		// Move negations in a truth preserving way to apply only to literals.
+		
+		//call helper method to eliminate conditions
+		traverseTreeDistributeOr(tree);
+
+		//set dirtyTree flag for display
+		dirtyTree = true;
 	}
 
 	public void collapse()
