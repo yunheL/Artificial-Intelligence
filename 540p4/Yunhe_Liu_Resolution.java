@@ -358,6 +358,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 					childrenList[i].getChild(1).addChild(rightGrandChild);
 					
 					//leftFixed = true;
+					traverseTreeRemoveConditions(childrenList[i]);
 				}
 				//left child is "and"
 				else if(leftLogic.getName().equalsIgnoreCase("and"))
@@ -383,6 +384,8 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 					//add child to right child
 					childrenList[i].getChild(1).addChild(rightGrandChild);
 					childrenList[i].getChild(1).addChild(rightLogic);
+					
+					traverseTreeRemoveConditions(childrenList[i]);
 				}
 				
 				//keep traversing both children in case original both
@@ -392,7 +395,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 				//System.out.println("child1 is: " + childrenList[i].getChild(1));
 				//traverseTreeDistributeOr(childrenList[i].getChild(0));
 				//traverseTreeDistributeOr(childrenList[i].getChild(1));
-				traverseTreeRemoveConditions(childrenList[i]);
+				//traverseTreeRemoveConditions(childrenList[i]);
 			}
 			else{
 				//keep traversing if childrenList[i] is not condition
