@@ -502,7 +502,13 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	public boolean isLiteralNegated(XML literal) 
 	{ 
 		// TODO - Implement to return true when this literal is negated and false otherwise.
+		if(literal.getName().equalsIgnoreCase("not"))
+		{
+			return true;
+		}
+		
 		return false; 
+		
 	}
 
 	public String getAtomFromLiteral(XML literal) 
