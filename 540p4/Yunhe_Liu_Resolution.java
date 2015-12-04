@@ -416,7 +416,8 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		//System.out.println("tree is " + tree);
 
 		//call helper method to eliminate Biconditions
-		traverseTreeRemoveBiconditions(tree);
+		//TODO - Debug code reverse
+		//traverseTreeRemoveBiconditions(tree);
 
 		//set dirtyTree flag for display
 		dirtyTree = true;
@@ -436,12 +437,14 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		XML Clause = new XML ("or");
 		XML child0 = new XML("a");
 		XML neg = new XML("not");
-		XML child1 = new XML("b");
+		XML child1 = new XML("a");
 		Clause.addChild(child0);
 		neg.addChild(child1);
 		Clause.addChild(neg);
 		
+		System.out.println("should be true: " + clauseIsTautology(Clause));
 		
+		//test case need to be revised to test differenment methods
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
 		System.out.println("should be true: " + clauseContainsLiteral(Clause, "a", false));
 		System.out.println("should be true: " + clauseContainsLiteral(Clause, "b", true));
@@ -613,7 +616,29 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement to return true when this clause contains a literal
 		// along with the negated form of that same literal.  Otherwise, return false.
+		XML[] childrenList = clause.getChildren();
+		boolean isTautology = false;
+		
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			if(isLiteralNegated(childrenList[i]))
+			{
+				isTautology = clauseContainsLiteral(clause, getAtomFromLiteral(childrenList[i]), false);
+			}
+			else
+			{
+				isTautology = clauseContainsLiteral(clause, getAtomFromLiteral(childrenList[i]), true);
+			}
+			
+			if(isTautology == true)
+			{
+				return true;
+			}
+			
+			i++;
+		}
 		return false;
-	}	
-
+	}
+	
 }
