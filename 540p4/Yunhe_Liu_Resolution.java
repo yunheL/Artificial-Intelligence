@@ -32,6 +32,34 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 			i++;
 		}
 	}
+	
+	/*
+	 * This helper method removes all the children that has the name "name" of the
+	 * XML node passed in to the method
+	 */
+	public void removeSpecificChildren(XML data, String name)
+	{
+		//base case for recursion
+		if (data == null)	
+			return;
+
+		//The list contains all the children of the current
+		//node.
+		XML[] childrenList = data.getChildren();
+
+		//remove all the children of the passed in XML node
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//System.out.println(childrenList[i]);
+			if(childrenList[i].getName().equalsIgnoreCase(name))
+			{
+				//System.out.print("here");
+				data.removeChild(childrenList[i]);
+			}
+			i++;
+		}
+	}
 
 	/*
 	 * This helper method add child as the (index)th children of
@@ -406,6 +434,90 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		}
 	}
 	
+	public void traverseTreeCreateNNary(XML curr)
+	{
+		//System.out.println("here");
+		//base case
+		if(curr == null)
+			return;
+
+		XML[] childrenList = curr.getChildren();
+		//System.out.println("here0");
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			//System.out.println("here1");
+			//if current node is bicondition
+			if(childrenList[i].getName().equalsIgnoreCase("and") )
+			{
+				//System.out.println(i);
+				
+				//TODO - remove debug code
+				//System.out.println("here2");
+
+				//keep traversing recusively
+				traverseTreeCreateNNary(childrenList[i]);
+
+				//create N-nary
+				//validation: make sure childrenList[i] has at least
+				//two children
+				if(childrenList[i].getChildCount() < 2)
+				{
+					System.out.println("remove bicondition children"
+							+ " count error");
+					return;
+				}
+
+				XML[] subChildrenList = childrenList[i].getChildren();
+				
+				int j = 0;
+				while(j < subChildrenList.length)
+				{
+					if(subChildrenList[j].getName().equalsIgnoreCase("and"))
+					{
+						//TODO - remove debug code
+						//System.out.println("here3");
+						XML[] grandChildrenList = subChildrenList[i].getChildren();
+						
+						int k = 0;
+						for(k = 0; k<grandChildrenList.length; k++)
+						{
+							childrenList[i].addChild(grandChildrenList[k]);
+						}
+						
+					}
+					j++;
+				}
+				removeSpecificChildren(childrenList[i], "and");
+				
+				/*
+				//eliminate bicondition connect by "and"
+				childrenList[i].setName("and");
+
+				//remove all the children for reconstruction
+				removeAllChildren(childrenList[i]);
+
+				//add two conditon children
+				childrenList[i].addChild("condition");
+				childrenList[i].addChild("condition");
+
+				//add logic to the left condition
+				childrenList[i].getChild(0).addChild(leftLogic);
+				childrenList[i].getChild(0).addChild(rightLogic);
+
+				//add logic to the right condition
+				childrenList[i].getChild(1).addChild(rightLogic);
+				childrenList[i].getChild(1).addChild(leftLogic);
+				*/
+			}
+			else{
+				//keep traversing if childrenList[i] is not bicondition
+				traverseTreeCreateNNary(childrenList[i]);
+			}
+			//don't forget the increase counter!
+			i++;
+		}
+	}
 
 	public void eliminateBiconditions()
 	{
@@ -419,6 +531,11 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		//TODO - Debug code reverse
 		traverseTreeRemoveBiconditions(tree);
 
+		
+		
+		//TODO - Debug Code
+		//traverseTreeCreateNNary(tree);
+		
 		//set dirtyTree flag for display
 		dirtyTree = true;
 		
@@ -558,6 +675,16 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		// redundant clauses from the tree.
 		// 3) Also remove any clauses that are always true (tautologies)
 		// from your tree to help speed up resolution.
+		
+		//call helper method to eliminate conditions
+		traverseTreeCreateNNary(tree);
+
+		
+		//removeSpecificChildren(tree, "and");
+		//set dirtyTree flag for display
+		dirtyTree = true;
+		
+		
 	}	
 
 	public boolean applyResolution()
