@@ -417,7 +417,7 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 
 		//call helper method to eliminate Biconditions
 		//TODO - Debug code reverse
-		//traverseTreeRemoveBiconditions(tree);
+		traverseTreeRemoveBiconditions(tree);
 
 		//set dirtyTree flag for display
 		dirtyTree = true;
@@ -451,6 +451,63 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", true));
 		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", false));
+		
+		XML set = new XML ("and");
+		XML clause1 = new XML ("or");
+		XML clause2 = new XML ("or");
+		XML liter1 = new XML ("a");
+		XML liter2 = new XML ("b");
+		XML liter3 = new XML ("c");
+		XML liter4 = new XML ("d");
+		XML neg = new XML("not");
+		clause1.addChild(liter1);
+		clause1.addChild(liter2);
+		clause2.addChild(liter3);
+		neg.addChild(liter4);
+		clause2.addChild(neg);
+		set.addChild(clause1);
+		set.addChild(clause2);
+		
+		XML neg2 = new XML("not");
+		XML clause3 = new XML ("or");
+		XML clause4 = new XML ("or");
+		XML clause5 = new XML ("or");
+		XML clause6 = new XML ("or");
+		XML clause7 = new XML ("or");
+		XML clause8 = new XML ("or");
+		
+		XML liter5 = new XML ("a");
+		XML liter6 = new XML ("b");
+		XML liter7 = new XML ("c");
+		XML liter8 = new XML ("d");
+		XML liter9 = new XML ("f");
+		
+		neg2.addChild(liter8);
+		clause3.addChild(liter6);
+		clause3.addChild(liter5);
+		
+		clause4.addChild(liter5);
+		clause4.addChild(liter6);
+		
+		clause5.addChild(liter5);
+		clause5.addChild(liter7);
+		
+		clause6.addChild(liter5);
+		clause6.addChild(liter9);
+		
+		clause7.addChild(liter7);
+		clause7.addChild(neg2);
+		
+		
+		
+		System.out.println("set is: " + set.toString());
+		System.out.println("clause7 is: " + clause7.toString());
+		
+		System.out.println("should be true: " + setContainsClause(set, clause3));
+		System.out.println("should be true: " + setContainsClause(set, clause4));
+		System.out.println("should be false: " + setContainsClause(set, clause5));
+		System.out.println("should be false: " + setContainsClause(set, clause6));
+		System.out.println("should be true: " + setContainsClause(set, clause7));
 		*/
 	}	
 
@@ -609,6 +666,54 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	{
 		// TODO - Implement to return true when the set contains a clause with the
 		// same set of literals as the clause parameter.  Otherwise, return false.
+		XML[] childrenList = set.getChildren();
+		//System.out.println("childrenList length is: "+ childrenList.length);
+		boolean contains = false;
+		
+		int i = 0;
+		while(i < childrenList.length)
+		{
+			XML[] subChildrenList = childrenList[i].getChildren();
+			XML[] clauseChildrenList = clause.getChildren();
+			
+			//System.out.println("subChildrenList length is: "+subChildrenList.length);
+			//System.out.println("clauseChildrenList length is: "+clauseChildrenList.length);
+			
+			if(subChildrenList.length == clauseChildrenList.length)
+			{
+				int j = 0;
+				while(j < subChildrenList.length)
+				{
+					if(isLiteralNegated(subChildrenList[j]))
+					{
+						contains = clauseContainsLiteral(clause, getAtomFromLiteral(subChildrenList[j]), true);
+					}
+					else
+					{
+						contains = clauseContainsLiteral(clause, getAtomFromLiteral(subChildrenList[i]), false);
+					}
+					
+					if(contains == false)
+					{
+						break;
+					}
+				
+					j++;
+				}
+			}
+			else
+			{
+				contains = false;
+			}
+			
+			if(contains == true)
+			{
+				return true;
+			}
+			
+			i++;
+		}
+		
 		return false;
 	}
 
