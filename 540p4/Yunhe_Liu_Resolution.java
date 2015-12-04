@@ -420,6 +420,17 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 
 		//set dirtyTree flag for display
 		dirtyTree = true;
+		
+		/*
+		//TODO - Debug code
+		XML neg = new XML("not");
+		XML pos = new XML("yes");
+		neg.addChild(pos);
+		System.out.println("Is negated?: " + isLiteralNegated(pos));
+		System.out.println("Atom fom neg: " + getAtomFromLiteral(neg));
+		System.out.println("Atom fom pos: " + getAtomFromLiteral(pos));
+		*/
+		
 	}	
 
 	public void eliminateConditions()
@@ -514,7 +525,15 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	public String getAtomFromLiteral(XML literal) 
 	{ 
 		// TODO - Implement to return the name of the atom in this literal as a string.
-		return "";
+		
+		if(isLiteralNegated(literal))
+		{
+			return literal.getChild(0).getName();
+		}
+		else
+		{
+			return literal.getName();
+		}
 	}	
 
 	public boolean clauseContainsLiteral(XML clause, String atom, boolean isNegated)
