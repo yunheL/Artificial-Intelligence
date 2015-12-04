@@ -431,6 +431,24 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 		System.out.println("Atom fom pos: " + getAtomFromLiteral(pos));
 		*/
 		
+		/*
+		//TODO - Debug code
+		XML Clause = new XML ("or");
+		XML child0 = new XML("a");
+		XML neg = new XML("not");
+		XML child1 = new XML("b");
+		Clause.addChild(child0);
+		neg.addChild(child1);
+		Clause.addChild(neg);
+		
+		
+		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
+		System.out.println("should be true: " + clauseContainsLiteral(Clause, "a", false));
+		System.out.println("should be true: " + clauseContainsLiteral(Clause, "b", true));
+		System.out.println("should be false: " + clauseContainsLiteral(Clause, "a", true));
+		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", true));
+		System.out.println("should be false: " + clauseContainsLiteral(Clause, "c", false));
+		*/
 	}	
 
 	public void eliminateConditions()
@@ -539,7 +557,48 @@ public class Yunhe_Liu_Resolution extends DrawableTree
 	public boolean clauseContainsLiteral(XML clause, String atom, boolean isNegated)
 	{
 		// TODO - Implement to return true when the provided clause contains a literal
-		// with the atomic name and negation (isNegated).  Otherwise, return false.		
+		// with the atomic name and negation (isNegated).  Otherwise, return false.	
+		XML[] childrenList = clause.getChildren();
+		//System.out.println(childrenList[0]);
+		//System.out.println(childrenList[1]);
+		//System.out.println(childrenList[1].getChild(0));
+		if(!isNegated)
+		{
+			int i = 0;
+			while(i < childrenList.length)
+			{
+				if(childrenList[i].getName().equalsIgnoreCase(atom))
+				{
+					return true;
+				}
+				i++;
+			}
+		}
+		else
+		{
+			int i = 0;
+			while(i < childrenList.length)
+			{
+				if(childrenList[i].getName().equalsIgnoreCase("not"))
+				{
+					//System.out.println("childrenList[i] is: " + childrenList[i].getName());
+					//System.out.println("its child[0] is: " + childrenList[i].getChild(0));
+					
+					if(childrenList[i].getChild(0) != null)
+					{
+						if(childrenList[i].getChild(0).getName().equalsIgnoreCase(atom))
+						{
+							return true;
+						}
+					}
+					else
+					{
+						System.out.println("Error in clauseContainsLiteral");
+					}
+				}
+				i++;
+			}
+		}
 		return false;
 	}
 
