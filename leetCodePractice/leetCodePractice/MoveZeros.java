@@ -1,15 +1,43 @@
+//This solution is accepted as of 12/31/2015
+//Question credit to leetcode
+//Author: Yunhe Liu <liu348@wisc.edu>
 package leetCodePractice;
 import java.util.Arrays;
 
+/*
+ * This method works as:
+ * Given an integer array, move all the 0 to
+ * the end of the array without changing the 
+ * sequence of the other elements
+ * For example:
+ * input1: [0, 1, 0, 3, 12]
+ * output1: [1, 3, 12, 0, 0]
+ */
 public class MoveZeros {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		//Enter test cases here
 		int[] nums = new int[]{0,1,0,3,12};
+		int[] nums1 = new int[]{0};
+		int[] nums2 = new int[]{2,1,0,3,12};
 		
 		moveZeroes(nums);
+		System.out.println("Test");
 		System.out.println("Exp: [1, 3, 12, 0, 0]");
 		System.out.println("Now: " + Arrays.toString(nums));
+		System.out.println();
+		
+		moveZeroes(nums1);
+		System.out.println("Test");
+		System.out.println("Exp: [0]");
+		System.out.println("Now: " + Arrays.toString(nums1));
+		System.out.println();
+		
+		moveZeroes(nums2);
+		System.out.println("Test");
+		System.out.println("Exp: [2, 1, 3, 12, 0]");
+		System.out.println("Now: " + Arrays.toString(nums2));
+		System.out.println();
 	}
 
 	public static void moveZeroes(int[] nums) {

@@ -1,5 +1,28 @@
+//Question credit to leetcode
+//Author: Yunhe Liu <liu348@wisc.edu>
 package leetCodePractice;
 
+/*
+ * This class is supposed to work as:
+ * Returning one of the existing equilibrium point in O(N)
+ * Time complexity
+ * Defining a equilibrium point:
+ * Given a integer array with length N. If there is a
+ * zero-based index P such that the sum of the elements[0..P-1]
+ * equals to the sum of the elements [P+1, N-1], then we call
+ * P a equilibrium point. 
+ * For example:
+ * Given integer array {1,2,3,4,3,2,1}
+ * index 3 (element = 4) would be a equilibrium point 
+ * 
+ * Note, when P = 0 or P = N-1, we define
+ * one the sums as 0
+ * For example:
+ * Given integer array {1, -1, 1}
+ * index 0 would be a equilibrium point.
+ * 
+ * Worst-case time complexity O(N)
+ */
 public class Test {
 
 	public static void main(String[] args) {

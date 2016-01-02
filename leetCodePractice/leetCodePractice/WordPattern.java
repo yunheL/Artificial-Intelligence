@@ -1,6 +1,23 @@
+//this solution is accepted as of 12/31/2015
+//Question credit to leetcode
+//Author: Yunhe Liu <liu348@wisc.edu>
 package leetCodePractice;
 //import java.util.Arrays;
 
+/*
+ * This class works as:
+ * Given a string of words and a string of pattern.
+ * See whether the string matches the pattern. Return a boolean.
+ * 
+ * For example:
+ * Input string words: "cat dog dog cat"
+ * Input String pattern: "abba"
+ * Output: True
+ * 
+ * Input string words: "dog dog dog dog"
+ * Input String pattern: "abba"
+ * Output: false
+ */
 public class WordPattern {
 
 	public static void main(String[] args) {
@@ -11,6 +28,8 @@ public class WordPattern {
 	}
 	
 	public static boolean wordPattern(String pattern, String str) {
+		//split pattern into char array
+		//split word into string array
 		String[] wordList = str.split(" ");
 		char[] charList = pattern.toCharArray();
 		//int[] indexList = new int[wordList.length];
@@ -33,6 +52,7 @@ public class WordPattern {
 		{
 			for(j=i+1;j<charList.length;j++)
 			{
+				//if pattern same and word different return false
 				if(charList[i] == charList[j])
 				{
 					if(!wordList[i].equalsIgnoreCase(wordList[j]))
@@ -41,6 +61,7 @@ public class WordPattern {
 					}
 				}
 				
+				//if pattern different and word same return false
 				if(charList[i] != charList[j])
 				{
 					if(wordList[i].equalsIgnoreCase(wordList[j]))
@@ -51,6 +72,7 @@ public class WordPattern {
 			}
 		}
 		
+		//otherwise the pattern and word list agrees
 		return true;
     }
 
