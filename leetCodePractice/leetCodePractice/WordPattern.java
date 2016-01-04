@@ -22,8 +22,8 @@ public class WordPattern {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String abba = "cat dog dog cat";
-		System.out.println(wordPattern("abba", abba));
+		String abba = "cat donkey donkey donkey horse horse cat dog";
+		System.out.println(wordPattern("abbbccaa", abba));
 		
 	}
 	

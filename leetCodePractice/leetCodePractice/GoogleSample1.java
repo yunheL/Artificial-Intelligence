@@ -21,7 +21,7 @@ public class GoogleSample1 {
 
 	public static void main(String[] args) {
 		//enter test cases here
-		int test = 12654321;
+		int test = 123454321;
 		solution(test);
 	}
 	

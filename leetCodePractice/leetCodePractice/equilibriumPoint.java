@@ -1,4 +1,4 @@
-//Question credit to leetcode
+//Question credit to Google Interview Practice
 //Author: Yunhe Liu <liu348@wisc.edu>
 package leetCodePractice;
 
@@ -23,7 +23,7 @@ package leetCodePractice;
  * 
  * Worst-case time complexity O(N)
  */
-public class Test {
+public class equilibriumPoint {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
