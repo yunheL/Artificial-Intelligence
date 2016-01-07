@@ -59,7 +59,7 @@ public class equilibriumPoint {
 				failCount++;
 			}
 			System.out.println("Expected: " + expected[i] 
-					+ "result = " + result[i]);
+					+ " result = " + result[i]);
 		}
 		
 		System.out.println("=====Test Summary=====");
@@ -94,6 +94,7 @@ public class equilibriumPoint {
 	 */
 	
 	public static int solution(int[] A) {
+
 		int sum = sumIntArray(A);
 		int currSum = 0;
 
