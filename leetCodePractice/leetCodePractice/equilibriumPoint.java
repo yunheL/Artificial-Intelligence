@@ -30,6 +30,9 @@ public class equilibriumPoint {
 	 * the solution.
 	 */
 	public static void main(String[] args) {
+		
+		int passCount = 0;
+		int failCount = 0;
 
 		int[] A = new int[]{-1, 3, -4, 5, 1, -6, 2, 1};
 		int[] A1 = new int[]{};
@@ -38,12 +41,34 @@ public class equilibriumPoint {
 		int[] A4 = new int[]{4,3,4,3,4,3,4,3,4};
 		int[] A5 = new int[]{6,5,1,5,6};
 		
-		System.out.println("Expected: 1, result = " + solution(A));
-		System.out.println("Expected: -1, result = " + solution(A1));		
-		System.out.println("Expected: 0, result = " + solution(A2));
-		System.out.println("Expected: 2, result = " + solution(A3));
-		System.out.println("Expected: 4, result = " + solution(A4));
-		System.out.println("Expected: 2, result = " + solution(A5));
+		int[] expected = new int[]{1,-1,0,2,4,2};
+		int[] result = new int[]{solution(A), solution(A1), solution(A2),
+				solution(A3),solution(A4),solution(A5)};
+		int i = 0;
+		for(; i<result.length; i++)
+		{
+			if(result[i] == expected[i])
+			{
+				System.out.print("Passed! ");
+				passCount++;
+			}
+			else
+			{
+				System.out.print("Failed! ");
+				failCount++;
+			}
+			System.out.println("Expected: " + expected[i] 
+					+ "result = " + result[i]);
+		}
+		
+		System.out.println("=====Test Summary=====");
+		if(passCount == result.length)
+			System.out.println("Congrats! All passed! ^_^");
+		else
+			System.out.println("Oops! Some case did not pass! >_<");
+		
+		System.out.print("Passed: " + passCount + " Failed: " + failCount);
+		
 	}
 	
 	/*
@@ -66,10 +91,11 @@ public class equilibriumPoint {
 	/*
 	 * O(N) Solution
 	 */
+	
 	public static int solution(int[] A) {
 		int sum = sumIntArray(A);
 		int currSum = 0;
-		
+
 		int i = 0;
 		for(;i<A.length;i++)
 		{
