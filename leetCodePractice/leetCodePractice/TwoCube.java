@@ -1,3 +1,4 @@
+//Implementation done. Quick study example
 package leetCodePractice;
 
 public class TwoCube {
