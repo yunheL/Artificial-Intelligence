@@ -1,3 +1,4 @@
+//Tested by Yunhe. Passed on 1/7/2016
 //Question credit to Google Interview Practice
 //Author: Yunhe Liu <liu348@wisc.edu>
 package leetCodePractice;
