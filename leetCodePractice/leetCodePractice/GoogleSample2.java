@@ -8,10 +8,10 @@ package leetCodePractice;
  * system. For example:
  * root
  * 	dir1
- * 		pic1.jpg
  * 		file1.txt
  * 		dir11
  *  dir2
+ *  	pic1.jpg
  *  
  * Find and return length (counting chars) the full
  * path to a picture file.
